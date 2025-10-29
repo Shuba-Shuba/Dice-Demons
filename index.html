@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | Dice Demons</title>
+  <link rel="stylesheet" href="css/style.css"></link>
+</head>
+<body>
+  <div id="menu"></div>
+  <script src="js/menu.js"></script>
+  <div id="current-page-container">
+    <div class="page" id="game">
+      <canvas id="canvas" width="300" height="300"></canvas>
+      <button onclick="spinButton()">spin</button>
+      <button onclick="reverseButton()">reverse</button>
+      <button onclick="cancelButton()">cancel</button>
+      <br>
+    </div>
+  </div>
+  <div id="hidden-page-container">
+    <div class="page" id="rules">
+      <pre>Dice is health, strength, and money
+  
+  Board is 2 rings, with a “fan” between the rings
+  • The fan blades function as bridges between the inner and outer rings
+  • The fan blades move every turn
+
+  Players start on the inner ring
+  Monster starts on the outer ring
+
+  Players start with no dice
+
+  Die pickups start on all non-wall spaces on outer ring
+
+  Win condition: First player to get back to the middle with the trinket and 3 dice wins
+
+  On your turn:
+    1. Movement: roll 3 dice
+      a. Monster moves lowest number, fan moves median number, player moves highest number
+        i. You control how all 3 of these things move
+      b. Move these 3 in any order, you can also split up movement (e.g. if player moves 3, you can first move 2, next move something else, and then move player 1)
+    2. If the player lands exactly on a die, they pick it up
+      a. Max 3 dice
+        i. If you already have 3 dice, you can’t pick up any more
+    3. Dice sacrifices, OPTIONAL: sacrifice dice any number of times to do things
+      a. Wall placement: costs 1 die
+        i. Roll a die for number of walls to get
+        ii. Place new walls OR take control of existing walls owned by other players
+        iii. Can only place walls on marked wall spaces
+        iv. Only the player who controls a wall may go to the space it is on
+      b. Summon monster: costs 1 die
+        i. Summon a new monster anywhere on the board, except on top of a player
+      c. After sacrificing a die, a die pickup spawns on the farthest away non-wall space on the outer ring
+    4. Player vs. Monster combat: If the monster is on the same space as a player, then they must fight; if adjacent to monster, choose whether or not to fight:
+      a. Monster rolls 3 dice
+      b. Player rolls however many dice they have (0 to 4)
+        i. If you have 0 dice you are guaranteed to lose
+      c. Highest sum of rolled dice wins fight
+        i. Both reroll if tied
+      d. If player wins fight:</pre>
+    </div>
+  </div>
+  <script src="js/game.js"></script>
+</body>
+</html>

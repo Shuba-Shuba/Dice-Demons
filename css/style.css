@@ -1,0 +1,17 @@
+#menu {
+  background-color: black;
+}
+
+#menu button {
+  width: 100px;
+  height: 50px;
+  margin: 10px;
+}
+
+#current-page-container {
+  display: block;
+}
+
+#hidden-page-container {
+  display: none;
+}
