@@ -27,7 +27,6 @@ function spinButton() {
 function reverseButton() {
   // flip spin direction
   spin *= -1;
-  document.getElementById("tmp_spin").textContent = spin;
 
   // animate to new state
   spinAnimation();
