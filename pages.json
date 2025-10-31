@@ -1,10 +1,14 @@
 [
   {
-    "title": "Game",
+    "title": "Home",
     "id": "game"
   },
   {
     "title": "Rules",
     "id": "rules"
+  },
+  {
+    "title": "Lobby",
+    "id": "lobby"
   }
 ]

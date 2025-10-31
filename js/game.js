@@ -27,9 +27,6 @@ function spinButton() {
 function reverseButton() {
   // flip spin direction
   spin *= -1;
-
-  // animate to new state
-  spinAnimation();
 }
 
 function spinAnimation() {
