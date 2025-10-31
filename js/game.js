@@ -8,7 +8,6 @@ var spin = 60;
 
 // initialize spin stuff
 canvas.style.rotate = "0deg";
-document.getElementById("tmp_spin").textContent = spin;
 
 // draw canvas
 context.fillStyle = "green";
