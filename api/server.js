@@ -10,43 +10,25 @@ const PORT = 8080;
 
 // static files (frontend)
 const path = require('path');
-app.use('/',express.static(path.join(__dirname, '../frontend')));
-
-
-// everything below is for API (backend)
-
-app.use(express.json());
-
-// chat
-var messages = [];
+app.use('/',express.static(__dirname));
 
 io.on('connection', (socket) => {
   console.log('New user connected');
   socket.emit('newMessage', {
     from: 'Server',
-    text: 'Welcome!',
+    text: 'bro connected',
     createdAt: Date.now()
   });
   socket.on('createMessage', (message) => {
-    console.log('New message: ', message);
+    console.log('bro said ', message);
     io.emit('newMessage', message);
   });
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('bro disconnected');
   });
 });
 
-// app.get('/chat', (req, res) => {
-//   res.send(messages);
-// });
-
-// app.post('/chat', (req, res) => {
-//   const {msg} = req.body;
-//   messages.push(msg);
-//   res.status(200).send(msg);
-// });
-
-app.listen(PORT, (error) => {
+server.listen(PORT, (error) => {
   if(!error) console.log(`Server listening on port ${PORT}`);
   else console.log("Error starting server: ",error);
 });

@@ -4,6 +4,20 @@ const SPIN_ANIMATION_DURATION = 200;
 
 var spin = 60;
 
+// setup websocket
+const socket = io();
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+socket.on('newMessage', (message) => {
+  let li = document.createElement('li');
+  li.textContent = `<${message.from}> ${message.text}`;
+  document.getElementById('chat-messages').appendChild(li);
+});
+socket.on('disconnect', () => {
+  console.log('disconnected from server');
+});
+
 // initialize spin stuff
 canvas.style.rotate = "0deg";
 
@@ -53,16 +67,21 @@ function spinAnimation() {
 
 function sendMessage() {
   const msg = document.getElementById("chat-input-text").value;
-  var req = new XMLHttpRequest();
-  req.onreadystatechange = () => {
-    if(req.readyState === XMLHttpRequest.DONE && req.status === 200){
-      let p = document.createElement("p");
-      // server's response is the message you sent
-      p.textContent = req.response;
-      document.getElementById("chat-messages").appendChild(p);
-    }
-  }
-  req.open("POST", "/chat", true);
-  req.setRequestHeader('Content-Type','application/json');
-  req.send(`{"msg": "${msg}"}`);
+  // var req = new XMLHttpRequest();
+  // req.onreadystatechange = () => {
+  //   if(req.readyState === XMLHttpRequest.DONE && req.status === 200){
+  //     let p = document.createElement("p");
+  //     // server's response is the message you sent
+  //     p.textContent = req.response;
+  //     document.getElementById("chat-messages").appendChild(p);
+  //   }
+  // }
+  // req.open("POST", "/chat", true);
+  // req.setRequestHeader('Content-Type','application/json');
+  // req.send(`{"msg": "${msg}"}`);
+  socket.emit('createMessage', {
+    from: 'client',
+    text: msg,
+    createdAt: Date.now()
+  });
 }
