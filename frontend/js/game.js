@@ -10,9 +10,9 @@ socket.on('connect', () => {
   console.log('Connected to server');
 });
 socket.on('newMessage', (message) => {
-  let li = document.createElement('li');
-  li.textContent = `<${message.from}> ${message.text}`;
-  document.getElementById('chat-messages').appendChild(li);
+  let p = document.createElement('p');
+  p.textContent = `<${message.from}> ${message.text}`;
+  document.getElementById('chat-messages').appendChild(p);
 });
 socket.on('disconnect', () => {
   console.log('disconnected from server');
