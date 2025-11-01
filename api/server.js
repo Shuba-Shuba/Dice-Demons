@@ -10,7 +10,11 @@ const PORT = 8080;
 
 // static files (frontend)
 const path = require('path');
-app.use('/',express.static(__dirname));
+app.use('/',express.static(path.join(__dirname,'../frontend')));
+
+app.get('/socket.io/socket.io.js', (req, res) => {
+  res.sendFile(path.join(__dirname,'/socket.io/socket.io.js'));
+});
 
 io.on('connection', (socket) => {
   console.log('New user connected');
@@ -20,7 +24,7 @@ io.on('connection', (socket) => {
     createdAt: Date.now()
   });
   socket.on('createMessage', (message) => {
-    console.log('bro said ', message);
+    console.log('bro said', message);
     io.emit('newMessage', message);
   });
   socket.on('disconnect', () => {
