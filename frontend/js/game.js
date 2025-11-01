@@ -1,6 +1,6 @@
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
-const SPIN_ANIMATION_DURATION = 400;
+const SPIN_ANIMATION_DURATION = 200;
 
 
 var spin = 60;
@@ -31,16 +31,18 @@ function reverseButton() {
 
 function spinAnimation() {
   // get old rotation
-  var rotationStr = canvas.style.rotate;
-  var rotation = parseInt(rotationStr.substring(0,rotationStr.length-3));
+  var oldRotation = canvas.style.rotate;
+  
+  // calculate new rotation
+  var newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+spin) + "deg";
   
   // animate to new rotation
   // animations auto-removed so no memory leak
   new Animation(new KeyframeEffect(
     canvas,
     [
-      {rotate: rotationStr},
-      {rotate: String(rotation+spin) + "deg"},
+      {rotate: oldRotation},
+      {rotate: newRotation},
     ],
     {
       duration: SPIN_ANIMATION_DURATION,
@@ -48,5 +50,20 @@ function spinAnimation() {
   )).play();
 
   // update rotation value
-  canvas.style.rotate = String(rotation+spin) + "deg";
+  canvas.style.rotate = newRotation;
+}
+
+function sendMessage() {
+  var msg = document.getElementById("chat-input-text").value;
+  var req = new XMLHttpRequest();
+  req.onreadystatechange = () => {
+    if(req.readyState === XMLHttpRequest.DONE && req.status === 200){
+      let p = document.createElement("p");
+      p.textContent = req.response;
+      document.getElementById("chat-messages").appendChild(p);
+    }
+  }
+  req.open("POST", "/chat", true);
+  req.setRequestHeader('Content-Type','application/json');
+  req.send(`{"msg": "${msg}"}`);
 }

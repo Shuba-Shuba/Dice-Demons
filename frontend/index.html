@@ -12,7 +12,7 @@
   <div id="current-page-container">
     <div class="page" id="game">
       <canvas id="canvas" width="300" height="300"></canvas>
-      <br>
+      <br />
       <button onclick="spinButton()">spin</button>
       <button onclick="reverseButton()">reverse</button>
     </div>
@@ -73,7 +73,15 @@ On your turn:
     c. Whoever moved most recently must move away, winning player decides which adjacent space they go to
     d. Losing player loses a die roll’s amount of walls, chosen by the winner</pre>
     </div>
-    <div class="page" id="lobby">this is the lobby</div>
+    <div class="page" id="chat">
+      <div id="chat">
+        <div id="chat-input">
+          <input type="text" name="msg" id="chat-input-text" placeholder="Say something..." />
+          <button id="chat-input-send" onclick="sendMessage()">Send Message</button>
+        </div>
+        <div id="chat-messages"></div>
+      </div>
+    </div>
   </div>
   <script src="js/game.js"></script>
 </body>
