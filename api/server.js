@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const path = require('path');
+const PORT = 8080;
 
-app.get('/', (req, res) => {
-  res.send('bro sucks');
-})
+// static files (frontend)
+app.use('/',express.static(path.join(__dirname, '../frontend')));
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
