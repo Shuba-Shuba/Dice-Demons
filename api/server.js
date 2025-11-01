@@ -5,7 +5,7 @@ const socketIO = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
-const PORT = 8080;
+const PORT = 80;
 
 
 // static files (frontend)
