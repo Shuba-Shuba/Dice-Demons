@@ -84,4 +84,5 @@ function sendMessage() {
     text: msg,
     createdAt: Date.now()
   });
+  document.getElementById("chat-input-text").value = "";
 }
