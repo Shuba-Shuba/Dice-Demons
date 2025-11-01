@@ -2,9 +2,7 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 const SPIN_ANIMATION_DURATION = 200;
 
-
 var spin = 60;
-
 
 // initialize spin stuff
 canvas.style.rotate = "0deg";
@@ -31,10 +29,10 @@ function reverseButton() {
 
 function spinAnimation() {
   // get old rotation
-  var oldRotation = canvas.style.rotate;
+  const oldRotation = canvas.style.rotate;
   
   // calculate new rotation
-  var newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+spin) + "deg";
+  const newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+spin) + "deg";
   
   // animate to new rotation
   // animations auto-removed so no memory leak
@@ -54,11 +52,12 @@ function spinAnimation() {
 }
 
 function sendMessage() {
-  var msg = document.getElementById("chat-input-text").value;
+  const msg = document.getElementById("chat-input-text").value;
   var req = new XMLHttpRequest();
   req.onreadystatechange = () => {
     if(req.readyState === XMLHttpRequest.DONE && req.status === 200){
       let p = document.createElement("p");
+      // server's response is the message you sent
       p.textContent = req.response;
       document.getElementById("chat-messages").appendChild(p);
     }
