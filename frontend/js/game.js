@@ -1,8 +1,8 @@
+const SPIN_ANIMATION_DURATION = 200;
+var spin = 60;
+
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
-const SPIN_ANIMATION_DURATION = 200;
-
-var spin = 60;
 
 // setup websocket
 const socket = io();
@@ -15,19 +15,39 @@ socket.on('connect', () => {
 socket.on('newMessage', (msg) => {
   showMessage(`<${msg.from}> ${msg.text}`);
 });
+socket.on('generateID', (id) => {
+  setCookie('id', id);
+  console.log('got ID from server: ', id);
+});
 
-// initialize spin stuff
+
 canvas.style.rotate = "0deg";
-
-// draw canvas
 context.fillStyle = "green";
 context.beginPath();
 context.arc(200,150,50,0,Math.PI*2);
 context.fill();
-
 context.fillStyle = "red";
 context.fillRect(0,0,100,100);
 
+if(getCookie('username')) document.getElementById('username-input-text').value = getCookie('username');
+else document.getElementById('username-input-text').value = "unnamed";
+
+
+function setCookie(name, value) {
+  var d = new Date();
+  d.setTime(d.getTime() + 8640000);
+  document.cookie = name + "=" + value + ";" + "expires=" + d.toUTCString() + ";path=/";
+}
+
+function getCookie(name) {
+  if(name.length == 0) return undefined;
+  var n = name + "=";
+  var cookie = decodeURIComponent(document.cookie);
+  if(cookie.indexOf(n) == -1) return undefined;
+  var value = cookie.substring(cookie.indexOf(n)+n.length);
+  if(value.indexOf(';') != -1) value = value.substring(0, value.indexOf(';'));
+  return value;
+}
 
 function spinButton() {
   // animate to new state
@@ -63,10 +83,15 @@ function spinAnimation() {
   canvas.style.rotate = newRotation;
 }
 
+function setUsername() {
+  const username = document.getElementById('username-input-text').value;
+  setCookie('username', username);
+  socket.emit('setUsername', username);
+}
+
 function sendMessage() {
   const msg = document.getElementById("chat-input-text").value;
   socket.emit('createMessage', {
-    from: 'client',
     text: msg,
     createdAt: Date.now()
   });

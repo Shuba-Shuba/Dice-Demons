@@ -74,13 +74,15 @@ On your turn:
     d. Losing player loses a die roll’s amount of walls, chosen by the winner</pre>
     </div>
     <div class="page" id="chat">
-      <div id="chat">
-        <div id="chat-input">
-          <input type="text" name="msg" id="chat-input-text" placeholder="Say something..." />
-          <button id="chat-input-send" onclick="sendMessage()">Send Message</button>
-        </div>
-        <div id="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" name="msg" id="username-input-text" value="unnamed" placeholder="dumb_idiot123" />
+        <button id="username-input-text" onclick="setUsername()">Set Username</button>
       </div>
+      <div class="chat-input">
+        <input type="text" name="msg" id="chat-input-text" placeholder="Say something..." />
+        <button id="chat-input-send" onclick="sendMessage()">Send Message</button>
+      </div>
+      <div id="chat-messages"></div>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
