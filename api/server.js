@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
   
   socket.on('createMessage', (message) => {
     const cookie = getCookies(socket);
-    if(!connectedClients[cookie.id]) return invalidID('createMessage', socket);
+    if(!connectedClients[cookie.id]) return invalidID('createMessage');
     
     io.emit('newMessage', {
       from: connectedClients[cookie.id].username,
@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
 
   socket.on('setUsername', (username) => {
     const cookie = getCookies(socket);
-    if(!connectedClients[cookie.id]) return invalidID('setUsername', socket);
+    if(!connectedClients[cookie.id]) return invalidID('setUsername');
     
     socket.broadcast.emit('newMessage', {
       from: 'Server',
@@ -131,6 +131,6 @@ function getCookies(socket) {
 }
 
 // force reconnect if invalid ID
-function invalidID(req, socket) {
+function invalidID(req) {
   console.error(`Received ${req} request for invalid ID`);
 }
