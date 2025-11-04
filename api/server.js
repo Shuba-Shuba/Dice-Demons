@@ -6,8 +6,8 @@ const crypto = require('crypto')
 
 const app = express();
 const options = {
-  key: fs.readFileSync("server.key"),
-  cert: fs.readFileSync("server.cert"),
+  key: fs.readFileSync("privkey.pem"),
+  cert: fs.readFileSync("fullchain.pem"),
 };
 const server = https.createServer(options, app);
 const io = new socketIO.Server(server);
