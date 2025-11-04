@@ -13,7 +13,8 @@
 }
 
 #chat-messages {
-  overflow: scroll;
+  overflow: auto;
+  height: fit-content;
 }
 
 #current-page-container {
