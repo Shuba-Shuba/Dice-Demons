@@ -14,11 +14,12 @@
 
 #chat-messages {
   overflow: auto;
-  height: fit-content;
+  max-height: 100%;
 }
 
 #current-page-container {
   display: block;
+  height: 100vh;
 }
 
 #hidden-page-container {
