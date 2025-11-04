@@ -30,23 +30,23 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 const connectedClients = {};
 
 io.on('connection', (socket) => {
-  const cookie = getCookies(socket);
+  socket.data = getCookies(socket);
 
-  if(!connectedClients[cookie.id]){
+  if(!connectedClients[socket.data.id]){
     // first connection
-    connectedClients[cookie.id] = {
-      username: cookie.username
+    connectedClients[socket.data.id] = {
+      username: socket.data.username
     };
     socket.broadcast.emit('newMessage', {
       from: 'Server',
-      text: `${cookie.username} joined`,
+      text: `${socket.data.username} joined`,
       createdAt: Date.now()
     });
   } else {
     // reconnection
     socket.broadcast.emit('newMessage', {
       from: 'Server',
-      text: `${cookie.username} opened a second tab or smth`,
+      text: `${socket.data.username} opened a second tab or smth`,
       createdAt: Date.now()
     });
   }
@@ -54,37 +54,35 @@ io.on('connection', (socket) => {
 
 
   socket.on('disconnect', () => {
-    const cookie = getCookies(socket);
     socket.broadcast.emit('newMessage', {
       from: 'Server',
-      text: `${connectedClients[cookie.id].username} disconnected`,
+      text: `${socket.data.username} disconnected`,
       createdAt: Date.now()
     });
-    delete connectedClients[cookie.id];
+    delete connectedClients[socket.data.id];
     console.log(connectedClients);
   });
   
   socket.on('createMessage', (message) => {
-    const cookie = getCookies(socket);
-    if(!connectedClients[cookie.id]) return invalidID('createMessage');
+    if(!connectedClients[socket.data.id]) return invalidID('createMessage');
     
     io.emit('newMessage', {
-      from: connectedClients[cookie.id].username,
+      from: socket.data.username,
       text: message.text,
       createdAt: message.createdAt
     });
   });
 
   socket.on('setUsername', (username) => {
-    const cookie = getCookies(socket);
-    if(!connectedClients[cookie.id]) return invalidID('setUsername');
+    if(!connectedClients[socket.data.id]) return invalidID('setUsername');
     
     socket.broadcast.emit('newMessage', {
       from: 'Server',
-      text: `${connectedClients[cookie.id].username} changed their username to ${username}`,
+      text: `${connectedClients[socket.data.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });
-    connectedClients[cookie.id].username = username;
+    connectedClients[socket.data.id].username = username;
+    socket.data.username = username;
     console.log(connectedClients);
   });
 });
