@@ -1,13 +1,17 @@
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const socketIO = require('socket.io');
 const {parse} = require('cookie');
 const crypto = require('crypto')
 
 const app = express();
-const server = http.createServer(app);
+const options = {
+  key: fs.readFileSync("server.key"),
+  cert: fs.readFileSync("server.cert"),
+};
+const server = https.createServer(options, app);
 const io = new socketIO.Server(server);
-const PORT = 80;
+const PORT = 443;
 
 
 // static files (frontend)
