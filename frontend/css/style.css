@@ -1,9 +1,23 @@
-#canvas {
-  background-color: aqua;
+html, body {
+  height: 100vh;
+  margin: 0;
+}
+
+#container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#hidden-page-container {
+  display: none;
 }
 
 #menu {
   background-color: black;
+  flex: 0 1 auto;
+  position: sticky;
+  top: 0;
 }
 
 #menu button {
@@ -12,16 +26,31 @@
   margin: 10px;
 }
 
-#chat-messages {
-  overflow: auto;
-  max-height: 100%;
-}
-
 #current-page-container {
-  display: block;
-  height: 100vh;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-#hidden-page-container {
-  display: none;
+#rules p {
+  margin: 1em;
+  white-space: pre-wrap;
+}
+
+#chat {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#chat .chat-input {
+  flex: 0 1 auto;
+}
+
+#chat-messages {
+  flex: 1 1 auto;
+  overflow: scroll;
+}
+
+#canvas {
+  background-color: aqua;
 }
