@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     const cookie = getCookies(socket);
     socket.broadcast.emit('newMessage', {
       from: 'Server',
-      text: `${cookie.username} disconnected`,
+      text: `${connectedClients[cookie.id].username} disconnected`,
       createdAt: Date.now()
     });
     delete connectedClients[cookie.id];
