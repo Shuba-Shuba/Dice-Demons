@@ -12,6 +12,10 @@
   margin: 10px;
 }
 
+#chat-messages {
+  overflow: scroll;
+}
+
 #current-page-container {
   display: block;
 }
