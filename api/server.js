@@ -1,5 +1,6 @@
 const express = require('express');
 const https = require('https');
+const fs = require('fs');
 const socketIO = require('socket.io');
 const {parse} = require('cookie');
 const crypto = require('crypto')
