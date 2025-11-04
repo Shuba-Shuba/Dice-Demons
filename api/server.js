@@ -132,6 +132,5 @@ function getCookies(socket) {
 
 // force reconnect if invalid ID
 function invalidID(req, socket) {
-  console.error(`Received ${req} request for invalid ID, forcing reconnect`);
-  socket.io.engine.close();
+  console.error(`Received ${req} request for invalid ID`);
 }
