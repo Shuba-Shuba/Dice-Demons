@@ -1,9 +1,6 @@
-var pages;
-
 fetch('pages.json')
   .then(response => response.json())
-  .then(data => {
-    pages = data;
+  .then(pages => {
     for(var page in pages){
       var button = document.createElement('button');
       button.textContent = pages[page].title
@@ -22,4 +19,4 @@ function menuButton() {
 
   // move clicked button's page to current container
   document.getElementById('current-page-container').appendChild(document.getElementById(this.id.substring(0, this.id.length - 11)));
-};
+}
