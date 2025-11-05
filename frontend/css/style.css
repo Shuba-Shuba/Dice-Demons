@@ -58,7 +58,8 @@ html, body {
 
 #chat-messages {
   flex: 1 1 auto;
-  overflow: scroll;
+  overflow: auto;
+  word-wrap: break-word;
   scroll-behavior: smooth;
   padding: 0 var(--page-margin);
   margin: 0 0 var(--page-margin);
