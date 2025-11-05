@@ -37,8 +37,8 @@ html, body {
 }
 
 .page {
-  --margin: 1em;
-  margin: var(--margin);
+  --page-margin: 1em;
+  margin: var(--page-margin);
 }
 
 #rules p {
@@ -48,16 +48,20 @@ html, body {
 #chat {
   display: flex;
   flex-flow: column;
-  height: calc(100% - var(--margin));
+  height: calc(100% - var(--page-margin));
 }
 
 #chat .chat-input {
   flex: 0 1 auto;
+  margin: 0 0 var(--page-margin)
 }
 
 #chat-messages {
   flex: 1 1 auto;
   overflow: scroll;
+  padding: 0 var(--page-margin);
+  margin: 0 0 var(--page-margin);
+  border: 1px solid black;
 }
 
 #canvas {
