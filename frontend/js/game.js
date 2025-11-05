@@ -18,6 +18,10 @@ socket.on('newMessage', (msg) => {
 socket.on('generateID', (id) => {
   setCookie('id', id);
   console.log('got ID from server: ', id);
+
+  // unique default username
+  document.getElementById('username-input-text').value = "unnamed" + (id%1000);
+  setUsername();
 });
 
 // setup canvas
