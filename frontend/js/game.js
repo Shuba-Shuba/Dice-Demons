@@ -20,7 +20,7 @@ socket.on('generateID', (id) => {
   console.log('got ID from server: ', id);
 });
 
-
+// setup canvas
 canvas.style.rotate = "0deg";
 context.fillStyle = "green";
 context.beginPath();
@@ -29,6 +29,7 @@ context.fill();
 context.fillStyle = "red";
 context.fillRect(0,0,100,100);
 
+// fill saved username
 if(getCookie('username')) document.getElementById('username-input-text').value = getCookie('username');
 else document.getElementById('username-input-text').value = "unnamed";
 
