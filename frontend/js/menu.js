@@ -8,7 +8,7 @@ fetch('pages.json')
       button.id = pages[page].id + "-menubutton";
       button.addEventListener('click', menuButton);
       document.getElementById('menu').appendChild(button);
-      if(pages[page].initial) button.menuButton();
+      if(pages[page].initial) button.addEventListener('load', menuButton, {once: true});
     }
   });
 
