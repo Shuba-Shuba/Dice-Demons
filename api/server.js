@@ -37,15 +37,13 @@ io.on('connection', (socket) => {
     connectedClients[socket.data.id] = {
       username: socket.data.username
     };
-    socket.broadcast.emit('newMessage', {
-      from: 'Server',
+    socket.broadcast.emit('serverMessage', {
       text: `${socket.data.username} joined`,
       createdAt: Date.now()
     });
   } else {
     // reconnection
-    socket.broadcast.emit('newMessage', {
-      from: 'Server',
+    socket.broadcast.emit('serverMessage', {
       text: `${socket.data.username} opened a second tab or smth`,
       createdAt: Date.now()
     });
@@ -54,8 +52,7 @@ io.on('connection', (socket) => {
 
 
   socket.on('disconnect', () => {
-    socket.broadcast.emit('newMessage', {
-      from: 'Server',
+    socket.broadcast.emit('serverMessage', {
       text: `${socket.data.username} disconnected`,
       createdAt: Date.now()
     });
@@ -66,7 +63,7 @@ io.on('connection', (socket) => {
   socket.on('createMessage', (message) => {
     if(!connectedClients[socket.data.id]) return invalidID('createMessage');
     
-    io.emit('newMessage', {
+    io.emit('chatMessage', {
       from: socket.data.username,
       text: message.text,
       createdAt: message.createdAt
@@ -76,8 +73,7 @@ io.on('connection', (socket) => {
   socket.on('setUsername', (username) => {
     if(!connectedClients[socket.data.id]) return invalidID('setUsername');
     
-    socket.broadcast.emit('newMessage', {
-      from: 'Server',
+    socket.broadcast.emit('serverMessage', {
       text: `${connectedClients[socket.data.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });

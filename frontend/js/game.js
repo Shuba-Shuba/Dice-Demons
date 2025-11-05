@@ -12,14 +12,17 @@ socket.on('disconnect', () => {
 socket.on('connect', () => {
   showMessage('Connected to server');
 });
-socket.on('newMessage', (msg) => {
+socket.on('chatMessage', (msg) => {
   showMessage(`<${msg.from}> ${msg.text}`);
+});
+socket.on('serverMessage', (msg) => {
+  showMessage(`${msg.text}`);
 });
 socket.on('generateID', (id) => {
   setCookie('id', id);
   console.log('got ID from server: ', id);
 
-  // unique default username
+  // quasi-unique default username
   document.getElementById('username-input-text').value = "unnamed" + (id%1000);
   setUsername();
 });
