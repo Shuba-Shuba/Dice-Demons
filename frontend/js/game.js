@@ -99,6 +99,7 @@ function setUsername() {
   const username = document.getElementById('username-input-text').value;
   document.getElementById('username-input-text').placeholder = username;
   document.getElementById('username-input-text').value = "";
+  showMessage(`Set username to ${username}`);
   setCookie('username', username);
   socket.emit('setUsername', username);
 }
