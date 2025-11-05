@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home | Dice Demons</title>
+  <title>Dice Demons</title>
   <link rel="stylesheet" href="css/style.css"></link>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   <div id="container">
     <div id="menu"></div>
-    <script src="js/menu.js"></script>
-    <div id="current-page-container">
+    <div id="current-page-container"></div>
+    <div id="hidden-page-container">
       <div class="page" id="game">
         <canvas id="canvas" width="300" height="300"></canvas>
         <br />
         <button onclick="spinButton()">spin</button>
         <button onclick="reverseButton()">reverse</button>
       </div>
-    </div>
-    <div id="hidden-page-container">
       <div class="page" id="rules">
         <p>Dice is health, strength, and money
 
@@ -86,7 +85,7 @@ On your turn:
         <div id="chat-messages"></div>
       </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/menu.js"></script>
     <script src="js/game.js"></script>
   </div>
 </body>

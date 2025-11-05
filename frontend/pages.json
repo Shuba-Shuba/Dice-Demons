@@ -1,7 +1,8 @@
 [
   {
     "title": "Home",
-    "id": "game"
+    "id": "game",
+    "initial": true
   },
   {
     "title": "Rules",

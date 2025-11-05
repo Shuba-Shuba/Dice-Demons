@@ -1,3 +1,4 @@
+// create menu buttons
 fetch('pages.json')
   .then(response => response.json())
   .then(pages => {
@@ -7,6 +8,7 @@ fetch('pages.json')
       button.id = pages[page].id + "-menubutton";
       button.addEventListener('click', menuButton);
       document.getElementById('menu').appendChild(button);
+      if(pages[page].initial) button.menuButton();
     }
   });
 
