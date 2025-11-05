@@ -3,7 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const socketIO = require('socket.io');
 const {parse} = require('cookie');
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 const app = express();
 const options = {
@@ -15,7 +15,7 @@ const io = new socketIO.Server(server);
 const PORT = 443;
 
 
-// static files (frontend)
+// frontend
 const path = require('path');
 // path to frontend folder
 app.use('/',express.static(path.join(__dirname,'../frontend')));
@@ -128,7 +128,7 @@ function getCookies(socket) {
   return cookieObj;
 }
 
-// force reconnect if invalid ID
+// hopefully this never runs
 function invalidID(req) {
   console.error(`Received ${req} request for invalid ID`);
 }
