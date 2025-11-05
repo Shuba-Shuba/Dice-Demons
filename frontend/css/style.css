@@ -26,6 +26,11 @@ html, body {
   margin: 10px;
 }
 
+#menu button.selected {
+  background-color: yellow;
+  border-color: gold;
+}
+
 #current-page-container {
   flex: 1 1 auto;
   min-height: 0;
