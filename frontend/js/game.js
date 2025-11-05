@@ -33,6 +33,17 @@ context.fillRect(0,0,100,100);
 if(getCookie('username')) document.getElementById('username-input-text').value = getCookie('username');
 else document.getElementById('username-input-text').value = "unnamed";
 
+// enter key submits chat input
+document.getElementById('chat').onkeydown = (e) => {
+  if(
+    e.key === 'Enter' &&
+    e.target.tagName === 'INPUT' &&
+    e.target.parentElement.classList.contains('chat-input')
+  ){
+    e.target.parentElement.querySelector('button').click();
+  }
+};
+
 
 function setCookie(name, value) {
   var d = new Date();
