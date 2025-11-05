@@ -102,4 +102,5 @@ function showMessage(txt) {
   var p = document.createElement('p');
   p.textContent = txt;
   document.getElementById('chat-messages').appendChild(p);
+  p.scrollIntoView();
 }
