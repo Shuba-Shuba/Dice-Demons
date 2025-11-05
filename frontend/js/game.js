@@ -30,8 +30,8 @@ context.fillStyle = "red";
 context.fillRect(0,0,100,100);
 
 // fill saved username
-if(getCookie('username')) document.getElementById('username-input-text').value = getCookie('username');
-else document.getElementById('username-input-text').value = "unnamed";
+if(getCookie('username')) document.getElementById('username-input-text').placeholder = getCookie('username');
+else document.getElementById('username-input-text').placeholder = "unnamed";
 
 // enter key submits chat input
 document.getElementById('chat').onkeydown = (e) => {
@@ -97,6 +97,8 @@ function spinAnimation() {
 
 function setUsername() {
   const username = document.getElementById('username-input-text').value;
+  document.getElementById('username-input-text').placeholder = username;
+  document.getElementById('username-input-text').value = "";
   setCookie('username', username);
   socket.emit('setUsername', username);
 }
