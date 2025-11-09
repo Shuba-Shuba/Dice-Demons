@@ -18,10 +18,11 @@ html, body {
   flex: 0 1 auto;
   position: sticky;
   top: 0;
+  display: flex;
 }
 
 #menu button {
-  width: 100px;
+  flex: 1 1;
   height: 50px;
   margin: 10px;
 }
