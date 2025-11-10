@@ -14,13 +14,24 @@ const server = https.createServer(options, app);
 const io = new socketIO.Server(server);
 const PORT = 443;
 
-// frontend
+const pages = JSON.parse(fs.readFileSync("../frontend/pages.json", "utf-8"));
 const path = require('path');
-// path to frontend folder
+
+// frontend
+// home page
 app.use('/',express.static(path.join(__dirname,'../frontend')));
+// socket.io script location is hardcoded
 app.get('/socket.io/socket.io.js', (req, res) => {
   res.sendFile(path.join(__dirname,'/socket.io/socket.io.js'));
 });
+// fake subdirectories for page navigation
+for(const page in pages){
+  app.use(`/${pages[page].id}`,
+    (req, res, next) => {console.log(req.originalUrl); next()},
+    express.static(path.join(__dirname,'../frontend')
+  ));
+}
+
 
 // io.emit -> everyone on server
 // socket.emit -> specific client
