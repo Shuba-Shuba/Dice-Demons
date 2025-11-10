@@ -14,7 +14,6 @@ const server = https.createServer(options, app);
 const io = new socketIO.Server(server);
 const PORT = 443;
 
-
 // frontend
 const path = require('path');
 // path to frontend folder
@@ -22,7 +21,6 @@ app.use('/',express.static(path.join(__dirname,'../frontend')));
 app.get('/socket.io/socket.io.js', (req, res) => {
   res.sendFile(path.join(__dirname,'/socket.io/socket.io.js'));
 });
-
 
 // io.emit -> everyone on server
 // socket.emit -> specific client
