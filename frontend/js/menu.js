@@ -4,10 +4,10 @@ fetch('pages.json')
   .then(pages => {
     for(var page in pages){
       var a = document.createElement('a');
-      a.href = `#${pages[page].id}`
+      a.href = `#${pages[page].id}`;
       document.getElementById('menu').appendChild(a);
       var button = document.createElement('button');
-      button.textContent = pages[page].title
+      button.textContent = pages[page].title;
       button.id = pages[page].id + "-menubutton";
       a.appendChild(button);
       if(pages[page].initial){
