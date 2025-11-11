@@ -58,20 +58,18 @@ if(chatLog !== null) for(const msg in chatLog){
 }
 
 
-function setCookie(name, value) {
-  var d = new Date();
-  d.setTime(d.getTime() + 864000000);
-  document.cookie = name + "=" + value + ";" + "expires=" + d.toUTCString() + ";path=/";
+function setCookie(key, value) {
+  // lasts up to 24 hours
+  document.cookie = `${key}=${value};max-age=86400;path=/`;
 }
 
-function getCookie(name) {
-  if(name.length == 0) return undefined;
-  var n = name + "=";
-  var cookie = decodeURIComponent(document.cookie);
-  if(cookie.indexOf(n) == -1) return undefined;
-  var value = cookie.substring(cookie.indexOf(n)+n.length);
-  if(value.indexOf(';') != -1) value = value.substring(0, value.indexOf(';'));
-  return value;
+function getCookie(key) {
+  const a = decodeURIComponent(document.cookie).split('; ');
+  for(const i in a){
+    // str: 'key=value'
+    const str = a[i];
+    if(str.startsWith(key)) return str.substring(key.length + 1);
+  };
 }
 
 function spinButton() {
