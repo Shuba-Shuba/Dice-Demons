@@ -60,7 +60,7 @@ if(chatLog !== null) for(const msg in chatLog){
 
 function setCookie(name, value) {
   var d = new Date();
-  d.setTime(d.getTime() + 8640000);
+  d.setTime(d.getTime() + 864000000);
   document.cookie = name + "=" + value + ";" + "expires=" + d.toUTCString() + ";path=/";
 }
 
