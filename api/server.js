@@ -44,7 +44,8 @@ io.on('connection', (socket) => {
   if(!connectedClients[socket.data.id]){
     // first connection
     connectedClients[socket.data.id] = {
-      username: socket.data.username
+      username: socket.data.username,
+      tabs: 1
     };
     socket.broadcast.emit('serverMessage', {
       text: `${socket.data.username} joined`,
@@ -53,20 +54,30 @@ io.on('connection', (socket) => {
   } else {
     // reconnection
     socket.broadcast.emit('serverMessage', {
-      text: `${socket.data.username} opened a second tab or smth`,
+      text: `${socket.data.username} opened an extra tab`,
       createdAt: Date.now()
     });
+    connectedClients[socket.data.id].tabs += 1;
   }
   console.log(connectedClients);
 
 
   socket.on('disconnect', () => {
-    socket.broadcast.emit('serverMessage', {
-      text: `${socket.data.username} disconnected`,
-      createdAt: Date.now()
-    });
-    delete connectedClients[socket.data.id];
-    console.log(connectedClients);
+    connectedClients[socket.data.id].tabs -= 1;
+    if(connectedClients[socket.data.id].tabs === 0){
+      socket.broadcast.emit('serverMessage', {
+        text: `${socket.data.username} disconnected`,
+        createdAt: Date.now()
+      });
+      delete connectedClients[socket.data.id];
+      console.log(connectedClients);
+    } else {
+      socket.broadcast.emit('serverMessage', {
+        text: `${socket.data.username} closed an extra tab`,
+        createdAt: Date.now()
+      });
+      console.log(connectedClients);
+    }
   });
   
   socket.on('createMessage', (message) => {
