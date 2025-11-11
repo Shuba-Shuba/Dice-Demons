@@ -3,25 +3,19 @@ fetch('pages.json')
   .then(response => response.json())
   .then(pages => {
     for(var page in pages){
-      // var a = document.createElement('a');
-      // a.href = `#${pages[page].id}`;
-      // document.getElementById('menu').appendChild(a);
       var button = document.createElement('button');
       button.textContent = pages[page].title;
       button.id = pages[page].id + "-menubutton";
       button.addEventListener('click', menuButton);
-      // a.appendChild(button);
       document.getElementById('menu').appendChild(button);
       if(pages[page].initial){
         button.classList.add('selected');
-        // if(location.hash === '') location.hash = pages[page].id;
         if(location.href.split('/')[3] === ''){
           history.replaceState(null, document.title, `/${pages[page].id}`);
           dispatchEvent(new Event('popstate'));
         }
       }
     }
-    // addEventListener('hashchange', changePage);
     addEventListener('popstate', changePage);
     // remove trailing slash
     history.replaceState(null, document.title, `/${location.href.split('/')[3]}`);
@@ -33,9 +27,6 @@ function changePage(){
   // const pageId = location.hash.substring(1);
   const pageId = location.href.split('/')[3];
   const buttonId = pageId + "-menubutton";
-
-  // don't do anything if clicked button's page is already the current page
-  if(document.getElementById('current-page-container').children[0].id === buttonId) return;
   
 
   // unselect old page button
@@ -54,6 +45,9 @@ function changePage(){
 
 
 function menuButton(){
+  // don't do anything if clicked button's page is already the current page
+  if(this.classList.contains('selected')) return;
+
   history.pushState(null, document.title, `/${this.id.substring(0,this.id.length-11)}`);
   dispatchEvent(new Event('popstate'));
 }
