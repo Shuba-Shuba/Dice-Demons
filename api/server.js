@@ -26,10 +26,7 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 });
 // fake subdirectories for page navigation
 for(const page in pages){
-  app.use(`/${pages[page].id}`,
-    (req, res, next) => {console.log(req.originalUrl); next()},
-    express.static(path.join(__dirname,'../frontend')
-  ));
+  app.use(`/${pages[page].id}`,express.static(path.join(__dirname,'../frontend')));
 }
 
 
