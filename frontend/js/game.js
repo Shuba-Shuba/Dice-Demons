@@ -7,16 +7,16 @@ const context = canvas.getContext("2d");
 // setup websocket
 const socket = io();
 socket.on('disconnect', () => {
-  showMessage('Disconnected from server');
+  receiveMessage('Disconnected from server');
 });
 socket.on('connect', () => {
-  showMessage('Connected to server');
+  receiveMessage('Connected to server');
 });
 socket.on('chatMessage', (msg) => {
-  showMessage(`<${msg.from}> ${msg.text}`);
+  receiveMessage(`<${msg.from}> ${msg.text}`);
 });
 socket.on('serverMessage', (msg) => {
-  showMessage(`${msg.text}`);
+  receiveMessage(`${msg.text}`);
 });
 socket.on('generateID', (id) => {
   setCookie('id', id);
@@ -50,6 +50,12 @@ document.getElementById('chat').onkeydown = (e) => {
     e.target.parentElement.querySelector('button').click();
   }
 };
+
+// load chat history from session storage
+var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
+if(chatLog !== null) for(const msg in chatLog){
+  showMessage(chatLog[msg]);
+}
 
 
 function setCookie(name, value) {
@@ -106,18 +112,28 @@ function setUsername() {
   const username = document.getElementById('username-input-text').value;
   document.getElementById('username-input-text').placeholder = username;
   document.getElementById('username-input-text').value = "";
-  showMessage(`Set username to ${username}`);
+  receiveMessage(`Set username to ${username}`);
   setCookie('username', username);
   socket.emit('setUsername', username);
 }
 
 function sendMessage() {
   const msg = document.getElementById("chat-input-text").value;
+  document.getElementById("chat-input-text").value = "";
   socket.emit('createMessage', {
     text: msg,
     createdAt: Date.now()
   });
-  document.getElementById("chat-input-text").value = "";
+}
+
+function receiveMessage(txt) {
+  showMessage(txt);
+
+  // save message
+  var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
+  if(chatLog === null) chatLog = [];
+  chatLog.push(txt);
+  sessionStorage.setItem('chatLog', JSON.stringify(chatLog));
 }
 
 function showMessage(txt) {
