@@ -47,10 +47,6 @@ html, body {
   margin: var(--page-margin);
 }
 
-#rules p {
-  white-space: pre-wrap;
-}
-
 #chat.selected {
   display: flex;
   flex-flow: column;

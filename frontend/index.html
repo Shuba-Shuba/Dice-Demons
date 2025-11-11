@@ -19,59 +19,76 @@
         <button onclick="reverseButton()">reverse</button>
       </div>
       <div class="page" id="rules">
-        <p>Dice is health, strength, and money
-
-Board is 2 rings, with a “fan” between the rings
-• The fan blades function as bridges between the inner and outer rings
-• The fan blades move every turn
-
-Players start on the inner ring
-Monster starts on the outer ring
-
-Players start with no dice
-
-Die pickups start on all non-wall spaces on outer ring
-
-Win condition: First player to get back to the middle with the trinket and 3 dice wins
-
-On your turn:
-  1. Movement: roll 3 dice
-    a. Monster moves lowest number, fan moves median number, player moves highest number
-      i. You control how all 3 of these things move
-    b. Move these 3 in any order, you can also split up movement (e.g. if player moves 3, you can first move 2, next move something else, and then move player 1)
-  2. If the player lands exactly on a die, they pick it up
-    a. Max 3 dice
-      i. If you already have 3 dice, you can’t pick up any more
-  3. Dice sacrifices, OPTIONAL: sacrifice dice any number of times to do things
-    a. Wall placement: costs 1 die
-      i. Roll a die for number of walls to get
-      ii. Place new walls OR take control of existing walls owned by other players
-      iii. Can only place walls on marked wall spaces
-      iv. Only the player who controls a wall may go to the space it is on
-    b. Summon monster: costs 1 die
-      i. Summon a new monster anywhere on the board, except on top of a player
-    c. After sacrificing a die, a die pickup spawns on the farthest away non-wall space on the outer ring
-  4. Player vs. Monster combat: If the monster is on the same space as a player, then they must fight; if adjacent to monster, choose whether or not to fight:
-    a. Monster rolls 3 dice
-    b. Player rolls however many dice they have (0 to 4)
-      i. If you have 0 dice you are guaranteed to lose
-    c. Highest sum of rolled dice wins fight
-      i. Both reroll if tied
-    d. If player wins fight:         
-      i. Get a trinket
-        1. Max 2 trinkets in circulation
-    e. If monster wins fight:
-      i. Player loses a die
-        1. If you already have zero dice before losing one, go back to the middle instead
-      ii. Player loses a trinket if they have any
-      iii. Monster may attack another player if adjacent
-    f. Player decides which adjacent space to go to after fight
-  5. Player vs. Player combat: If player lands on same space as another player, they must fight; if adjacent to another player, player who moved chooses whether or not to fight:
-    a. Extends rules from player vs. monster
-    b. Winning player steals a trinket from the losing player
-      i. If the loser doesn’t have a trinket, the winner doesn’t get one
-    c. Whoever moved most recently must move away, winning player decides which adjacent space they go to
-    d. Losing player loses a die roll’s amount of walls, chosen by the winner</p>
+        <h1>Dice is health, strength, and money</h1>
+        <h2>Board</h2>
+        <p>The board is made up of 2 rings, with a set of bridges between them</p>
+        <ul>
+          <li>Players start on the inner ring</li>
+          <li>Monster starts on the outer ring</li>
+          <li>The bridges move every turn</li>
+        </ul>
+        <h2>Dice</h2>
+        <p>Players start with no dice</p>
+        <p>Die pickups start on all non-wall spaces on outer ring</p>
+        <h2>Win condition</h2>
+        <p>First player to get back to the middle with the trinket and 3 dice wins</p>
+        <h2>On your turn</h2>
+        <ol>
+          <li>Movement: roll 3 dice<ul>
+            <li>Monster moves lowest number, fan moves median number, player moves highest number<ul>
+              <li>You control how all 3 of these things move</li>
+              <li>Move these 3 in any order<ul>
+                <li>You can also split up movement (e.g. if player moves 3, you can first move 2, next move something else, and then move player 1)</li>
+              </ul></li>
+            </ul></li>
+            <li>If the player lands exactly on a die, they pick it up<ul>
+              <li>Max 3 dice<ul>
+                <li>If you already have 3 dice, you can’t pick up any more</li>
+              </ul></li>
+            </ul></li>
+          </ul></li>
+          <li>Dice sacrifices, OPTIONAL: sacrifice dice any number of times to do things<ul>
+            <li>Wall placement: costs 1 die<ul>
+              <li>Roll a die for number of walls to get</li>
+              <li>Place new walls OR take control of existing walls owned by other players</li>
+              <li>Can only place walls on marked wall spaces</li>
+              <li>Only the player who controls a wall may go to the space it is on</li>
+            </ul></li>
+            <li>Summon monster: costs 1 die<ul>
+              <li>Summon a new monster anywhere on the board, except on top of a player</li>
+            </ul></li>
+            <li>After sacrificing a die, a die pickup spawns on the farthest away non-wall space on the outer ring</li>
+          </ul></li>
+          <li>Player vs. Monster combat: If the monster is on the same space as a player, then they must fight; if adjacent to monster, choose whether or not to fight:<ul>
+            <li>Monster rolls 3 dice</li>
+            <li>Player rolls however many dice they have (0 to 4)</li>
+            <li>Highest sum of rolled dice wins fight<ul>
+              <li>If you have 0 dice you are guaranteed to lose</li>
+              <li>Both reroll if tied</li>
+              <li>If player wins fight:<ul>
+                <li>Get a trinket<ul>
+                  <li>1. Max 2 trinkets in circulation</li>
+                </ul></li>
+              </ul></li>
+              <li>If monster wins fight:<ul>
+                <li>Player loses a die<ul>
+                  <li>If you already have zero dice before losing one, go back to the middle instead</li>
+                </ul></li>
+                <li>Player loses a trinket if they have any</li>
+                <li>Monster may attack another player if adjacent</li>
+                <li>Player decides which adjacent space to go to after fight</li>
+              </ul></li>
+            </ul></li>
+          </ul></li>
+          <li>Player vs. Player combat: If player lands on same space as another player, they must fight; if adjacent to another player, player who moved chooses whether or not to fight:<ul>
+            <li>Extends rules from player vs. monster</li>
+            <li>Winning player steals a trinket from the losing player<ul>
+              <li>If the loser doesn’t have a trinket, the winner doesn’t get one</li>
+            </ul></li>
+            <li>Whoever moved most recently must move away, winning player decides which adjacent space they go to</li>
+            <li>Losing player loses a die roll’s amount of walls, chosen by the winner</li>
+          </ul></li>
+        </ol>
       </div>
       <div class="page" id="chat">
         <div id="chat-messages"></div>
