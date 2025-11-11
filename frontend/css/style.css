@@ -9,7 +9,12 @@ html, body {
   height: 100%;
 }
 
-#hidden-page-container {
+#content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#content .page:not(.selected) {
   display: none;
 }
 
@@ -37,11 +42,6 @@ html, body {
   border-color: gold;
 }
 
-#current-page-container {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
 .page {
   --page-margin: 1em;
   margin: var(--page-margin);
@@ -51,7 +51,7 @@ html, body {
   white-space: pre-wrap;
 }
 
-#chat {
+#chat.selected {
   display: flex;
   flex-flow: column;
   height: calc(100% - var(--page-margin));

@@ -9,6 +9,7 @@ fetch('pages.json')
       button.addEventListener('click', menuButton);
       document.getElementById('menu').appendChild(button);
       if(pages[page].initial){
+        document.getElementById(pages[page].id).classList.add('selected');
         button.classList.add('selected');
         if(location.href.split('/')[3] === ''){
           history.replaceState(null, document.title, `/${pages[page].id}`);
@@ -24,23 +25,16 @@ fetch('pages.json')
 
 
 function changePage(){
-  // const pageId = location.hash.substring(1);
   const pageId = location.href.split('/')[3];
   const buttonId = pageId + "-menubutton";
-  
 
-  // unselect old page button
+  // unselect old button & select new button
   document.querySelector('#menu button.selected').classList.remove('selected');
-
-  // select this page button
   document.getElementById(buttonId).classList.add('selected');
 
-
-  // move old page from current container to hidden container
-  document.getElementById('hidden-page-container').appendChild(document.getElementById('current-page-container').children[0]);
-
-  // move clicked button's page to current container
-  document.getElementById('current-page-container').appendChild(document.getElementById(pageId));
+  // hide old page & show new page
+  document.querySelector('#content .page.selected').classList.remove('selected');
+  document.getElementById(pageId).classList.add('selected');
 }
 
 
