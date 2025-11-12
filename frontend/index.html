@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dice Demons</title>
-  <link rel="stylesheet" href="css/style.css"></link>
+  <link rel="stylesheet" href="css/style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -14,7 +14,7 @@
     <div id="content">
       <div class="page" id="game">
         <canvas id="canvas" width="300" height="300"></canvas>
-        <br />
+        <br>
         <button onclick="spinButton()">spin</button>
         <button onclick="reverseButton()">reverse</button>
       </div>
@@ -28,8 +28,7 @@
           <li>The bridges move every turn</li>
         </ul>
         <h2>Dice</h2>
-        <p>Players start with no dice</p>
-        <p>Die pickups start on all non-wall spaces on outer ring</p>
+        <p>Players start with no dice<br>Die pickups start on all non-wall spaces on outer ring</p>
         <h2>Win condition</h2>
         <p>First player to get back to the middle with the trinket and 3 dice wins</p>
         <h2>On your turn</h2>
@@ -93,11 +92,11 @@
       <div class="page" id="chat">
         <div id="chat-messages"></div>
         <div class="chat-input">
-          <input type="text" id="username-input-text" placeholder="unnamed" />
-          <button id="username-input-text" onclick="setUsername()">Set Username</button>
+          <input type="text" id="username-input-text" placeholder="unnamed">
+          <button id="username-input-send" onclick="setUsername()">Set Username</button>
         </div>
         <div class="chat-input">
-          <input type="text" id="chat-input-text" placeholder="Say something..." />
+          <input type="text" id="chat-input-text" placeholder="Say something...">
           <button id="chat-input-send" onclick="sendMessage()">Send Message</button>
         </div>
       </div>
