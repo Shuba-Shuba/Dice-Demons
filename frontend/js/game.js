@@ -1,61 +1,14 @@
 const SPIN_ANIMATION_DURATION = 200;
 var spin = 60;
-
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-// setup websocket
 const socket = io();
-socket.on('disconnect', () => {
-  receiveMessage('Disconnected from server');
-});
-socket.on('connect', () => {
-  receiveMessage('Connected to server');
-});
-socket.on('chatMessage', (msg) => {
-  receiveMessage(`<${msg.from}> ${msg.text}`);
-});
-socket.on('serverMessage', (msg) => {
-  receiveMessage(`${msg.text}`);
-});
-socket.on('generateID', (id) => {
-  setCookie('id', id);
-  console.log('got ID from server: ', id);
 
-  // quasi-unique default username
-  document.getElementById('username-input-text').value = "unnamed" + (id%1000);
-  setUsername();
-});
 
-// setup canvas
-canvas.style.rotate = "0deg";
-context.fillStyle = "green";
-context.beginPath();
-context.arc(200,150,50,0,Math.PI*2);
-context.fill();
-context.fillStyle = "red";
-context.fillRect(0,0,100,100);
-
-// fill saved username
-if(getCookie('username')) document.getElementById('username-input-text').placeholder = getCookie('username');
-else document.getElementById('username-input-text').placeholder = "unnamed";
-
-// enter key submits chat input
-document.getElementById('chat').onkeydown = (e) => {
-  if(
-    e.key === 'Enter' &&
-    e.target.tagName === 'INPUT' &&
-    e.target.parentElement.classList.contains('chat-input')
-  ){
-    e.target.parentElement.querySelector('button').click();
-  }
-};
-
-// load chat history from session storage
-var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
-if(chatLog !== null) for(const msg in chatLog){
-  showMessage(chatLog[msg]);
-}
+setupSocket();
+setupCanvas();
+setupChat();
 
 
 function setCookie(key, value) {
@@ -70,6 +23,29 @@ function getCookie(key) {
     const str = a[i];
     if(str.startsWith(key)) return str.substring(key.length + 1);
   };
+}
+
+function setupSocket() {
+  socket.on('disconnect', () => {
+    receiveMessage('Disconnected from server');
+  });
+  socket.on('connect', () => {
+    receiveMessage('Connected to server');
+  });
+  socket.on('chatMessage', (msg) => {
+    receiveMessage(`<${msg.from}> ${msg.text}`);
+  });
+  socket.on('serverMessage', (msg) => {
+    receiveMessage(`${msg.text}`);
+  });
+  socket.on('generateID', (id) => {
+    setCookie('id', id);
+    console.log('got ID from server: ', id);
+
+    // quasi-unique default username
+    document.getElementById('username-input-text').value = "unnamed" + (id%1000);
+    setUsername();
+  });
 }
 
 function spinButton() {
@@ -106,6 +82,16 @@ function spinAnimation() {
   canvas.style.rotate = newRotation;
 }
 
+function setupCanvas() {
+  canvas.style.rotate = "0deg";
+  context.fillStyle = "green";
+  context.beginPath();
+  context.arc(200,150,50,0,Math.PI*2);
+  context.fill();
+  context.fillStyle = "red";
+  context.fillRect(0,0,100,100);
+}
+
 function setUsername() {
   const username = document.getElementById('username-input-text').value;
   document.getElementById('username-input-text').placeholder = username;
@@ -139,4 +125,27 @@ function showMessage(txt) {
   p.textContent = txt;
   document.getElementById('chat-messages').appendChild(p);
   p.scrollIntoView();
+}
+
+function setupChat() {
+  // fill saved username
+  if(getCookie('username')) document.getElementById('username-input-text').placeholder = getCookie('username');
+  else document.getElementById('username-input-text').placeholder = "unnamed";
+
+  // enter key submits chat input
+  document.getElementById('chat').onkeydown = (e) => {
+    if(
+      e.key === 'Enter' &&
+      e.target.tagName === 'INPUT' &&
+      e.target.parentElement.classList.contains('chat-input')
+    ){
+      e.target.parentElement.querySelector('button').click();
+    }
+  };
+
+  // load chat history from session storage
+  var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
+  if(chatLog !== null) for(const msg in chatLog){
+    showMessage(chatLog[msg]);
+  }
 }
