@@ -16,6 +16,7 @@ html, body {
   top: 0;
   display: flex;
   padding-right: 10px;
+  z-index: 1;
 }
 
 #menu a {
@@ -68,6 +69,6 @@ html, body {
   border: 1px solid black;
 }
 
-#canvas {
+canvas {
   background-color: aqua;
 }

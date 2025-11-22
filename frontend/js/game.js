@@ -1,13 +1,10 @@
 const SPIN_ANIMATION_DURATION = 200;
-var spin = 60;
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
 
 const socket = io();
 
 
 setupSocket();
-setupCanvas();
+setupBoard();
 setupChat();
 
 
@@ -48,17 +45,7 @@ function setupSocket() {
   });
 }
 
-function spinButton() {
-  // animate to new state
-  spinAnimation();
-}
-
-function reverseButton() {
-  // flip spin direction
-  spin *= -1;
-}
-
-function spinAnimation() {
+function spinAnimation(canvas, spin) {
   // get old rotation
   const oldRotation = canvas.style.rotate;
   
@@ -82,14 +69,12 @@ function spinAnimation() {
   canvas.style.rotate = newRotation;
 }
 
-function setupCanvas() {
-  canvas.style.rotate = "0deg";
-  context.fillStyle = "green";
-  context.beginPath();
-  context.arc(200,150,50,0,Math.PI*2);
-  context.fill();
-  context.fillStyle = "red";
-  context.fillRect(0,0,100,100);
+function setupBoard() {
+  const canvases = document.getElementsByTagName('canvas');
+  for(var i=0; i<canvases.length; i++){
+    const canvas = canvases[i];
+    canvas.style.rotate = "0deg";
+  }
 }
 
 function setUsername() {
