@@ -16,7 +16,7 @@ html, body {
   top: 0;
   display: flex;
   padding-right: 10px;
-  z-index: 1;
+  z-index: 100;
 }
 
 #menu a {
@@ -25,7 +25,7 @@ html, body {
 
 #menu button {
   flex: 1 1;
-  height: 50px;
+  height: 4em;
   margin: 10px 0px 10px 10px;
 }
 
@@ -48,7 +48,7 @@ html, body {
   margin: var(--page-margin);
 }
 
-#chat.selected {
+.page.flex.selected {
   display: flex;
   flex-flow: column;
   height: calc(100% - var(--page-margin));
@@ -69,6 +69,37 @@ html, body {
   border: 1px solid black;
 }
 
-canvas {
+#board {
+  --board-size: min(calc(100vw - 2*var(--page-margin)), calc(100vh - 2*var(--page-margin) - 4em - 10px));
+}
+
+canvas.board {
+  position: absolute;
+  width: var(--board-size);
+  height: var(--board-size);
+}
+
+#spawn {
   background-color: aqua;
+  z-index: 1;
+}
+
+#bridge1 {
+  background-color: brown;
+  z-index: 2;
+}
+
+#land1 {
+  background-color: green;
+  z-index: 3;
+}
+
+#bridge2 {
+  background-color: orange;
+  z-index: 4;
+}
+
+#land2 {
+  background-color: blue;
+  z-index: 5;
 }

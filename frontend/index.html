@@ -12,12 +12,14 @@
     <div id="menu"></div>
     <script src="js/menu.js"></script>
     <div id="content">
-      <div class="page" id="game">
-        <canvas id="board-spawn" width="300" height="300"></canvas>
-        <canvas id="board-bridge1" width="300" height="300"></canvas>
-        <canvas id="board-land1" width="300" height="300"></canvas>
-        <canvas id="board-bridge2" width="300" height="300"></canvas>
-        <canvas id="board-land2" width="300" height="300"></canvas>
+      <div class="page flex" id="game">
+        <div id="board">
+          <canvas class="board" id="spawn" width="1000" height="1000"></canvas>
+          <canvas class="board" id="bridge1" width="1000" height="1000"></canvas>
+          <canvas class="board" id="land1" width="1000" height="1000"></canvas>
+          <canvas class="board" id="bridge2" width="1000" height="1000"></canvas>
+          <canvas class="board" id="land2" width="1000" height="1000"></canvas>
+        </div>
       </div>
       <div class="page" id="rules">
         <h1>Dice is health, strength, and money</h1>
@@ -90,7 +92,7 @@
           </ul></li>
         </ol>
       </div>
-      <div class="page" id="chat">
+      <div class="page flex" id="chat">
         <div id="chat-messages"></div>
         <div class="chat-input">
           <input type="text" id="username-input-text" placeholder="unnamed">
