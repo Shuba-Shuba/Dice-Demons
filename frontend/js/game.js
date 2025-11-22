@@ -45,17 +45,17 @@ function setupSocket() {
   });
 }
 
-function rotate(canvas, spin) {
+function rotate(element, rotation) {
   // get old rotation
-  const oldRotation = canvas.style.rotate;
+  const oldRotation = element.style.rotate;
   
   // calculate new rotation
-  const newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+spin) + "deg";
+  const newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+rotation) + "deg";
   
   // animate to new rotation
   // animations auto-removed so no memory leak
   new Animation(new KeyframeEffect(
-    canvas,
+    element,
     [
       {rotate: oldRotation},
       {rotate: newRotation},
@@ -66,7 +66,7 @@ function rotate(canvas, spin) {
   )).play();
 
   // update rotation value
-  canvas.style.rotate = newRotation;
+  element.style.rotate = newRotation;
 }
 
 function setupBoard() {
