@@ -45,7 +45,7 @@ function setupSocket() {
   });
 }
 
-function spinAnimation(canvas, spin) {
+function rotate(canvas, spin) {
   // get old rotation
   const oldRotation = canvas.style.rotate;
   
@@ -70,11 +70,67 @@ function spinAnimation(canvas, spin) {
 }
 
 function setupBoard() {
+  // explicitly set default rotation value
   const canvases = document.getElementsByTagName('canvas');
   for(var i=0; i<canvases.length; i++){
     const canvas = canvases[i];
     canvas.style.rotate = "0deg";
   }
+
+  const spawn = document.getElementById('spawn').getContext('2d');
+  spawn.fillStyle = 'green';
+  spawn.beginPath();
+  spawn.arc(500, 500, 100, 0, 2*Math.PI);
+  spawn.fill();
+  spawn.strokeStyle = 'white';
+  spawn.beginPath();
+  spawn.moveTo(500, 500);
+  spawn.lineTo(500, 400);
+  spawn.stroke();
+
+  const bridge1 = document.getElementById('bridge1').getContext('2d');
+  bridge1.beginPath();
+  bridge1.fillStyle = 'blue';
+  bridge1.arc(500, 500, 200, 0, 2*Math.PI);
+  bridge1.fill();
+  bridge1.strokeStyle = 'white';
+  bridge1.beginPath();
+  bridge1.moveTo(500, 400);
+  bridge1.lineTo(500, 300);
+  bridge1.stroke();
+
+  const land1 = document.getElementById('land1').getContext('2d');
+  land1.beginPath();
+  land1.fillStyle = 'green';
+  land1.arc(500, 500, 300, 0, 2*Math.PI);
+  land1.fill();
+  land1.strokeStyle = 'white';
+  land1.beginPath();
+  land1.moveTo(500, 300);
+  land1.lineTo(500, 200);
+  land1.stroke();
+
+  const bridge2 = document.getElementById('bridge2').getContext('2d');
+  bridge2.beginPath();
+  bridge2.fillStyle = 'blue';
+  bridge2.arc(500, 500, 400, 0, 2*Math.PI);
+  bridge2.fill();
+  bridge2.strokeStyle = 'white';
+  bridge2.beginPath();
+  bridge2.moveTo(500, 200);
+  bridge2.lineTo(500, 100);
+  bridge2.stroke();
+
+  const land2 = document.getElementById('land2').getContext('2d');
+  land2.beginPath();
+  land2.fillStyle = 'green';
+  land2.arc(500, 500, 500, 0, 2*Math.PI);
+  land2.fill();
+  land2.strokeStyle = 'white';
+  land2.beginPath();
+  land2.moveTo(500, 100);
+  land2.lineTo(500, 0);
+  land2.stroke();
 }
 
 function setUsername() {

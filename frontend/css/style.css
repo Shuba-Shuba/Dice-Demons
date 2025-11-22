@@ -75,31 +75,27 @@ html, body {
 
 canvas.board {
   position: absolute;
+  left: calc(50vw - var(--board-size)/2);
   width: var(--board-size);
   height: var(--board-size);
 }
 
 #spawn {
-  background-color: aqua;
-  z-index: 1;
+  z-index: 5;
 }
 
 #bridge1 {
-  background-color: brown;
-  z-index: 2;
+  z-index: 4;
 }
 
 #land1 {
-  background-color: green;
   z-index: 3;
 }
 
 #bridge2 {
-  background-color: orange;
-  z-index: 4;
+  z-index: 2;
 }
 
 #land2 {
-  background-color: blue;
-  z-index: 5;
+  z-index: 1;
 }
