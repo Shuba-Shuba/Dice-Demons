@@ -1,5 +1,11 @@
-const BOARD_PIXEL_RADIUS = 700;
+const BOARD_SPAWN_WIDTH = 100;
+const BOARD_LAND_WIDTH = 100;
+const BOARD_BRIDGE_LENGTH = 100;
+const BOARD_SPAWN_SPACES = 4;
 const BOARD_INLAND_TO_BRIDGES_RATIO = 4;
+const BOARD_RING_COUNT = 3; // excluding spawn
+const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
+
 const SPIN_ANIMATION_DURATION = 200;
 
 const socket = io();
@@ -72,34 +78,62 @@ function rotate(element, rotation) {
 }
 
 function setupBoard() {
-  // explicitly set default rotation value
-  const canvases = document.getElementsByTagName('canvas');
-  for(var i=0; i<canvases.length; i++){
-    const canvas = canvases[i];
-    canvas.style.rotate = "0deg";
+  // create canvases
+  const spawn = document.createElement('canvas');
+  spawn.classList.add('board');
+  spawn.id = 'spawn';
+  spawn.style.rotate = '0deg';
+  spawn.style.zIndex = -1;
+  spawn.width = BOARD_PIXEL_RADIUS*2;
+  spawn.height = BOARD_PIXEL_RADIUS*2;
+  document.getElementById('board').appendChild(spawn);
+  for(let i=1; i<=BOARD_RING_COUNT; i++){
+    // counting from 1
+
+    const bridgeCanvas = document.createElement('canvas');
+    bridgeCanvas.classList.add('board');
+    bridgeCanvas.id = `bridge${i}`;
+    bridgeCanvas.style.rotate = '0deg';
+    bridgeCanvas.style.zIndex = -2*i;
+    bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
+    bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
+    document.getElementById('board').appendChild(bridgeCanvas);
+
+    const landCanvas = document.createElement('canvas');
+    landCanvas.classList.add('board');
+    landCanvas.id = `land${i}`;
+    landCanvas.style.rotate = '0deg';
+    landCanvas.style.zIndex = -2*i - 1;
+    landCanvas.width = BOARD_PIXEL_RADIUS*2;
+    landCanvas.height = BOARD_PIXEL_RADIUS*2;
+    document.getElementById('board').appendChild(landCanvas);
   }
 
   // create rings
-  const spawn = document.getElementById('spawn').getContext('2d');
-  createLandRing(spawn, 100, 4);
+  const spawnCtx = document.getElementById('spawn').getContext('2d');
+  createLandRing(spawnCtx, BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
+  for(let i=1; i<=BOARD_RING_COUNT; i++){
+    createBridgeRing(document.getElementById(`bridge${i}`).getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i-1));
+    createLandRing(document.getElementById(`land${i}`).getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
+  }
 
-  const bridge1 = document.getElementById('bridge1').getContext('2d');
-  createBridgeRing(bridge1, 200, 4);
+  // const bridge1 = document.getElementById('bridge1').getContext('2d');
+  // createBridgeRing(bridge1, BOARD_SPAWN_WIDTH + 1*BOARD_BRIDGE_LENGTH, BOARD_SPAWN_SPACES*Math.pow(2, 0));
 
-  const land1 = document.getElementById('land1').getContext('2d');
-  createLandRing(land1, 300, 8);
+  // const land1 = document.getElementById('land1').getContext('2d');
+  // createLandRing(land1, BOARD_SPAWN_WIDTH + 1*BOARD_BRIDGE_LENGTH + 1*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, 1));
 
-  const bridge2 = document.getElementById('bridge2').getContext('2d');
-  createBridgeRing(bridge2, 400, 8);
+  // const bridge2 = document.getElementById('bridge2').getContext('2d');
+  // createBridgeRing(bridge2, BOARD_SPAWN_WIDTH + 2*BOARD_BRIDGE_LENGTH + 1*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, 1));
 
-  const land2 = document.getElementById('land2').getContext('2d');
-  createLandRing(land2, 500, 16);
+  // const land2 = document.getElementById('land2').getContext('2d');
+  // createLandRing(land2, BOARD_SPAWN_WIDTH + 2*BOARD_BRIDGE_LENGTH + 2*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, 2));
 
-  const bridge3 = document.getElementById('bridge3').getContext('2d');
-  createBridgeRing(bridge3, 600, 16);
+  // const bridge3 = document.getElementById('bridge3').getContext('2d');
+  // createBridgeRing(bridge3, BOARD_SPAWN_WIDTH + 3*BOARD_BRIDGE_LENGTH + 2*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, 2));
 
-  const land3 = document.getElementById('land3').getContext('2d');
-  createLandRing(land3, 700, 32);
+  // const land3 = document.getElementById('land3').getContext('2d');
+  // createLandRing(land3, BOARD_SPAWN_WIDTH + 3*BOARD_BRIDGE_LENGTH + 3*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, 3));
 }
 
 function createBridgeRing(ctx, r, spaces) {
@@ -127,13 +161,16 @@ function createBridgeRing(ctx, r, spaces) {
 
     // draw line
     ctx.beginPath();
-    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + 100);
+    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + BOARD_BRIDGE_LENGTH);
     ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
     ctx.stroke();
   }
 }
 
 function createLandRing(ctx, r, spaces) {
+  let landWidth = BOARD_LAND_WIDTH;
+  if(r === BOARD_SPAWN_WIDTH) landWidth = r;
+
   // green circle
   ctx.beginPath();
   ctx.fillStyle = 'green';
@@ -150,7 +187,7 @@ function createLandRing(ctx, r, spaces) {
 
     // draw line
     ctx.beginPath();
-    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + 100);
+    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + landWidth);
     ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
     ctx.stroke();
   }
