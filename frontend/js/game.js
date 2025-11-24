@@ -2,7 +2,7 @@ const BOARD_SPAWN_WIDTH = 100;
 const BOARD_LAND_WIDTH = 100;
 const BOARD_BRIDGE_LENGTH = 100;
 const BOARD_SPAWN_SPACES = 4;
-const BOARD_SPACES_TO_BRIDGES_RATIO = 8;
+const BOARD_SPACES_TO_BRIDGES_RATIO = 8; // spaces counted on outside
 const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
 
@@ -78,7 +78,7 @@ function rotate(element, rotation) {
 }
 
 function setupBoard() {
-  // create canvases
+  // create spawn ring
   const spawn = document.createElement('canvas');
   spawn.classList.add('board');
   spawn.id = 'spawn';
@@ -86,7 +86,10 @@ function setupBoard() {
   spawn.style.zIndex = -1;
   spawn.width = BOARD_PIXEL_RADIUS*2;
   spawn.height = BOARD_PIXEL_RADIUS*2;
+  drawLandRing(spawn.getContext('2d'), BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
   document.getElementById('board').appendChild(spawn);
+
+  // create outer rings
   for(let i=1; i<=BOARD_RING_COUNT; i++){
     // counting from 1
 
@@ -97,6 +100,7 @@ function setupBoard() {
     bridgeCanvas.style.zIndex = -2*i;
     bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
     bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
+    drawBridgeRing(bridgeCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
     document.getElementById('board').appendChild(bridgeCanvas);
 
     const landCanvas = document.createElement('canvas');
@@ -106,21 +110,12 @@ function setupBoard() {
     landCanvas.style.zIndex = -2*i - 1;
     landCanvas.width = BOARD_PIXEL_RADIUS*2;
     landCanvas.height = BOARD_PIXEL_RADIUS*2;
+    drawLandRing(landCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
     document.getElementById('board').appendChild(landCanvas);
-  }
-
-  // create rings
-  const spawnCtx = document.getElementById('spawn').getContext('2d');
-  createLandRing(spawnCtx, BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
-  for(let i=1; i<=BOARD_RING_COUNT; i++){
-    // counting from 1
-    createBridgeRing(document.getElementById(`bridge${i}`).getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
-    createLandRing(document.getElementById(`land${i}`).getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
   }
 }
 
-function createBridgeRing(ctx, r, spaces) {
-  // spaces counted on outside
+function drawBridgeRing(ctx, r, spaces) {
   const bridges = spaces/BOARD_SPACES_TO_BRIDGES_RATIO;
 
   // blue circle
@@ -150,7 +145,7 @@ function createBridgeRing(ctx, r, spaces) {
   }
 }
 
-function createLandRing(ctx, r, spaces) {
+function drawLandRing(ctx, r, spaces) {
   let landWidth = BOARD_LAND_WIDTH;
   if(r === BOARD_SPAWN_WIDTH) landWidth = r;
 
