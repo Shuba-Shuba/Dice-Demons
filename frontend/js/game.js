@@ -1,3 +1,5 @@
+const BOARD_PIXEL_RADIUS = 700;
+const BOARD_INLAND_TO_BRIDGES_RATIO = 4;
 const SPIN_ANIMATION_DURATION = 200;
 
 const socket = io();
@@ -77,60 +79,144 @@ function setupBoard() {
     canvas.style.rotate = "0deg";
   }
 
+  // create rings
   const spawn = document.getElementById('spawn').getContext('2d');
-  spawn.fillStyle = 'green';
-  spawn.beginPath();
-  spawn.arc(500, 500, 100, 0, 2*Math.PI);
-  spawn.fill();
-  spawn.strokeStyle = 'white';
-  spawn.beginPath();
-  spawn.moveTo(500, 500);
-  spawn.lineTo(500, 400);
-  spawn.stroke();
+  // spawn.fillStyle = 'green';
+  // spawn.beginPath();
+  // spawn.arc(700, 700, 100, 0, 2*Math.PI);
+  // spawn.fill();
+  // spawn.strokeStyle = 'white';
+  // spawn.beginPath();
+  // spawn.moveTo(700, 700);
+  // spawn.lineTo(700, 600);
+  // spawn.stroke();
+  createLandRing(spawn, 100, 4);
 
   const bridge1 = document.getElementById('bridge1').getContext('2d');
-  bridge1.beginPath();
-  bridge1.fillStyle = 'blue';
-  bridge1.arc(500, 500, 200, 0, 2*Math.PI);
-  bridge1.fill();
-  bridge1.strokeStyle = 'white';
-  bridge1.beginPath();
-  bridge1.moveTo(500, 400);
-  bridge1.lineTo(500, 300);
-  bridge1.stroke();
+  // bridge1.beginPath();
+  // bridge1.fillStyle = 'blue';
+  // bridge1.arc(700, 700, 200, 0, 2*Math.PI);
+  // bridge1.fill();
+  // bridge1.strokeStyle = 'white';
+  // bridge1.beginPath();
+  // bridge1.moveTo(700, 600);
+  // bridge1.lineTo(700, 500);
+  // bridge1.stroke();
+  createBridgeRing(bridge1, 200, 4);
 
   const land1 = document.getElementById('land1').getContext('2d');
-  land1.beginPath();
-  land1.fillStyle = 'green';
-  land1.arc(500, 500, 300, 0, 2*Math.PI);
-  land1.fill();
-  land1.strokeStyle = 'white';
-  land1.beginPath();
-  land1.moveTo(500, 300);
-  land1.lineTo(500, 200);
-  land1.stroke();
+  // land1.beginPath();
+  // land1.fillStyle = 'green';
+  // land1.arc(700, 700, 300, 0, 2*Math.PI);
+  // land1.fill();
+  // land1.strokeStyle = 'white';
+  // land1.beginPath();
+  // land1.moveTo(700, 500);
+  // land1.lineTo(700, 400);
+  // land1.stroke();
+  createLandRing(land1, 300, 8);
 
   const bridge2 = document.getElementById('bridge2').getContext('2d');
-  bridge2.beginPath();
-  bridge2.fillStyle = 'blue';
-  bridge2.arc(500, 500, 400, 0, 2*Math.PI);
-  bridge2.fill();
-  bridge2.strokeStyle = 'white';
-  bridge2.beginPath();
-  bridge2.moveTo(500, 200);
-  bridge2.lineTo(500, 100);
-  bridge2.stroke();
+  // bridge2.beginPath();
+  // bridge2.fillStyle = 'blue';
+  // bridge2.arc(700, 700, 400, 0, 2*Math.PI);
+  // bridge2.fill();
+  // bridge2.strokeStyle = 'white';
+  // bridge2.beginPath();
+  // bridge2.moveTo(700, 400);
+  // bridge2.lineTo(700, 300);
+  // bridge2.stroke();
+  createBridgeRing(bridge2, 400, 8);
 
   const land2 = document.getElementById('land2').getContext('2d');
-  land2.beginPath();
-  land2.fillStyle = 'green';
-  land2.arc(500, 500, 500, 0, 2*Math.PI);
-  land2.fill();
-  land2.strokeStyle = 'white';
-  land2.beginPath();
-  land2.moveTo(500, 100);
-  land2.lineTo(500, 0);
-  land2.stroke();
+  // land2.beginPath();
+  // land2.fillStyle = 'green';
+  // land2.arc(700, 700, 500, 0, 2*Math.PI);
+  // land2.fill();
+  // land2.strokeStyle = 'white';
+  // land2.beginPath();
+  // land2.moveTo(700, 300);
+  // land2.lineTo(700, 200);
+  // land2.stroke();
+  createLandRing(land2, 500, 16);
+
+  const bridge3 = document.getElementById('bridge3').getContext('2d');
+  // bridge3.beginPath();
+  // bridge3.fillStyle = 'blue';
+  // bridge3.arc(700, 700, 600, 0, 2*Math.PI);
+  // bridge3.fill();
+  // bridge3.strokeStyle = 'white';
+  // bridge3.beginPath();
+  // bridge3.moveTo(700, 200);
+  // bridge3.lineTo(700, 100);
+  // bridge3.stroke();'
+  createBridgeRing(bridge3, 600, 16);
+
+  const land3 = document.getElementById('land3').getContext('2d');
+  // land3.beginPath();
+  // land3.fillStyle = 'green';
+  // land3.arc(700, 700, 700, 0, 2*Math.PI);
+  // land3.fill();
+  // land3.strokeStyle = 'white';
+  // land3.beginPath();
+  // land3.moveTo(700, 100);
+  // land3.lineTo(700, 0);
+  // land3.stroke();
+  createLandRing(land3, 700, 32);
+}
+
+function createBridgeRing(ctx, r, spaces) {
+  // spaces counted inland
+  const bridges = spaces/BOARD_INLAND_TO_BRIDGES_RATIO;
+
+  // blue circle
+  ctx.beginPath();
+  ctx.fillStyle = 'blue';
+  ctx.arc(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS, r, 0,2*Math.PI);
+  ctx.fill();
+
+  // bridges
+  // line through middle of bridge
+  ctx.strokeStyle = 'brown';
+  ctx.lineWidth = 50;
+  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+  ctx.rotate(Math.PI/2/spaces);
+  ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
+  for(let i=0; i<bridges; i++){
+    // add rotation
+    ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+    ctx.rotate(Math.PI*2/bridges);
+    ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
+
+    // draw line
+    ctx.beginPath();
+    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + 100);
+    ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
+    ctx.stroke();
+  }
+}
+
+function createLandRing(ctx, r, spaces) {
+  // green circle
+  ctx.beginPath();
+  ctx.fillStyle = 'green';
+  ctx.arc(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS, r, 0,2*Math.PI);
+  ctx.fill();
+
+  // space separators
+  ctx.strokeStyle = 'white';
+  for(let i=0; i<spaces; i++){
+    // add rotation
+    ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+    ctx.rotate(Math.PI*2/spaces);
+    ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
+
+    // draw line
+    ctx.beginPath();
+    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + 100);
+    ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
+    ctx.stroke();
+  }
 }
 
 function setUsername() {
