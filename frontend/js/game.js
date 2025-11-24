@@ -52,7 +52,7 @@ function rotate(element, rotation) {
   const oldRotation = element.style.rotate;
   
   // calculate new rotation
-  const newRotation = String(parseInt(oldRotation.substring(0,oldRotation.length-3))+rotation) + "deg";
+  const newRotation = String(parseFloat(oldRotation.substring(0,oldRotation.length-3))+rotation) + "deg";
   
   // animate to new rotation
   // animations auto-removed so no memory leak
@@ -81,87 +81,24 @@ function setupBoard() {
 
   // create rings
   const spawn = document.getElementById('spawn').getContext('2d');
-  // spawn.fillStyle = 'green';
-  // spawn.beginPath();
-  // spawn.arc(700, 700, 100, 0, 2*Math.PI);
-  // spawn.fill();
-  // spawn.strokeStyle = 'white';
-  // spawn.beginPath();
-  // spawn.moveTo(700, 700);
-  // spawn.lineTo(700, 600);
-  // spawn.stroke();
   createLandRing(spawn, 100, 4);
 
   const bridge1 = document.getElementById('bridge1').getContext('2d');
-  // bridge1.beginPath();
-  // bridge1.fillStyle = 'blue';
-  // bridge1.arc(700, 700, 200, 0, 2*Math.PI);
-  // bridge1.fill();
-  // bridge1.strokeStyle = 'white';
-  // bridge1.beginPath();
-  // bridge1.moveTo(700, 600);
-  // bridge1.lineTo(700, 500);
-  // bridge1.stroke();
   createBridgeRing(bridge1, 200, 4);
 
   const land1 = document.getElementById('land1').getContext('2d');
-  // land1.beginPath();
-  // land1.fillStyle = 'green';
-  // land1.arc(700, 700, 300, 0, 2*Math.PI);
-  // land1.fill();
-  // land1.strokeStyle = 'white';
-  // land1.beginPath();
-  // land1.moveTo(700, 500);
-  // land1.lineTo(700, 400);
-  // land1.stroke();
   createLandRing(land1, 300, 8);
 
   const bridge2 = document.getElementById('bridge2').getContext('2d');
-  // bridge2.beginPath();
-  // bridge2.fillStyle = 'blue';
-  // bridge2.arc(700, 700, 400, 0, 2*Math.PI);
-  // bridge2.fill();
-  // bridge2.strokeStyle = 'white';
-  // bridge2.beginPath();
-  // bridge2.moveTo(700, 400);
-  // bridge2.lineTo(700, 300);
-  // bridge2.stroke();
   createBridgeRing(bridge2, 400, 8);
 
   const land2 = document.getElementById('land2').getContext('2d');
-  // land2.beginPath();
-  // land2.fillStyle = 'green';
-  // land2.arc(700, 700, 500, 0, 2*Math.PI);
-  // land2.fill();
-  // land2.strokeStyle = 'white';
-  // land2.beginPath();
-  // land2.moveTo(700, 300);
-  // land2.lineTo(700, 200);
-  // land2.stroke();
   createLandRing(land2, 500, 16);
 
   const bridge3 = document.getElementById('bridge3').getContext('2d');
-  // bridge3.beginPath();
-  // bridge3.fillStyle = 'blue';
-  // bridge3.arc(700, 700, 600, 0, 2*Math.PI);
-  // bridge3.fill();
-  // bridge3.strokeStyle = 'white';
-  // bridge3.beginPath();
-  // bridge3.moveTo(700, 200);
-  // bridge3.lineTo(700, 100);
-  // bridge3.stroke();'
   createBridgeRing(bridge3, 600, 16);
 
   const land3 = document.getElementById('land3').getContext('2d');
-  // land3.beginPath();
-  // land3.fillStyle = 'green';
-  // land3.arc(700, 700, 700, 0, 2*Math.PI);
-  // land3.fill();
-  // land3.strokeStyle = 'white';
-  // land3.beginPath();
-  // land3.moveTo(700, 100);
-  // land3.lineTo(700, 0);
-  // land3.stroke();
   createLandRing(land3, 700, 32);
 }
 
