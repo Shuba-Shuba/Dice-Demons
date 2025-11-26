@@ -128,8 +128,9 @@ function drawBridgeRing(ctx, r, spaces) {
 
   // bridges
   ctx.fillStyle = 'brown';
-  ctx.rotate(Math.PI/spaces/4);
-  const bridgeAngle = Math.PI*3/2/spaces;
+  ctx.strokeStyle = 'white';
+  ctx.rotate(Math.PI/-2);
+  const bridgeAngle = Math.PI*2/spaces;
   for(let i=0; i<bridges; i++){
     // add rotation
     ctx.rotate(Math.PI*2/bridges);
@@ -138,7 +139,9 @@ function drawBridgeRing(ctx, r, spaces) {
     ctx.beginPath();
     ctx.arc(0,0, r, bridgeAngle,0, true);
     ctx.arc(0,0, r-BOARD_BRIDGE_LENGTH, 0,bridgeAngle);
+    ctx.closePath();
     ctx.fill();
+    ctx.stroke();
   }
 }
 
