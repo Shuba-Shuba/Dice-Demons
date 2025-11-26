@@ -127,18 +127,18 @@ function drawBridgeRing(ctx, r, spaces) {
   ctx.fill();
 
   // bridges
-  ctx.strokeStyle = 'brown';
-  ctx.lineWidth = 50;
-  ctx.rotate(Math.PI/spaces);
+  ctx.fillStyle = 'brown';
+  ctx.rotate(Math.PI/spaces/4);
+  const bridgeAngle = Math.PI*3/2/spaces;
   for(let i=0; i<bridges; i++){
     // add rotation
     ctx.rotate(Math.PI*2/bridges);
     
-    // draw line
+    // draw bridge
     ctx.beginPath();
-    ctx.moveTo(0, BOARD_BRIDGE_LENGTH-r);
-    ctx.lineTo(0, -r);
-    ctx.stroke();
+    ctx.arc(0,0, r, bridgeAngle,0, true);
+    ctx.arc(0,0, r-BOARD_BRIDGE_LENGTH, 0,bridgeAngle);
+    ctx.fill();
   }
 }
 
@@ -162,8 +162,8 @@ function drawLandRing(ctx, r, spaces) {
     
     // draw line
     ctx.beginPath();
-    ctx.moveTo(0, landWidth-r);
-    ctx.lineTo(0, -r);
+    ctx.moveTo(0, r-landWidth);
+    ctx.lineTo(0, r);
     ctx.stroke();
   }
 }
