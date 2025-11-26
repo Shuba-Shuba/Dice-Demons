@@ -2,7 +2,7 @@ const BOARD_SPAWN_WIDTH = 100;
 const BOARD_LAND_WIDTH = 100;
 const BOARD_BRIDGE_LENGTH = 100;
 const BOARD_SPAWN_SPACES = 4;
-const BOARD_SPACES_TO_BRIDGES_RATIO = 8; // spaces counted on outside
+const BOARD_SPACES_PER_BRIDGE = 8; // spaces counted on outside
 const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
 
@@ -116,7 +116,7 @@ function setupBoard() {
 }
 
 function drawBridgeRing(ctx, r, spaces) {
-  const bridges = spaces/BOARD_SPACES_TO_BRIDGES_RATIO;
+  const bridges = spaces/BOARD_SPACES_PER_BRIDGE;
 
   // blue circle
   ctx.beginPath();
