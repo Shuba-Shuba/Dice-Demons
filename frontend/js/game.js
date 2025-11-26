@@ -117,30 +117,27 @@ function setupBoard() {
 
 function drawBridgeRing(ctx, r, spaces) {
   const bridges = spaces/BOARD_SPACES_PER_BRIDGE;
+  
+  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
 
   // blue circle
   ctx.beginPath();
   ctx.fillStyle = 'blue';
-  ctx.arc(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS, r, 0,2*Math.PI);
+  ctx.arc(0,0, r, 0,2*Math.PI);
   ctx.fill();
 
   // bridges
-  // line through middle of bridge
   ctx.strokeStyle = 'brown';
   ctx.lineWidth = 50;
-  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
   ctx.rotate(Math.PI/spaces);
-  ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
   for(let i=0; i<bridges; i++){
     // add rotation
-    ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
     ctx.rotate(Math.PI*2/bridges);
-    ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
-
+    
     // draw line
     ctx.beginPath();
-    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + BOARD_BRIDGE_LENGTH);
-    ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
+    ctx.moveTo(0, BOARD_BRIDGE_LENGTH-r);
+    ctx.lineTo(0, -r);
     ctx.stroke();
   }
 }
@@ -149,24 +146,24 @@ function drawLandRing(ctx, r, spaces) {
   let landWidth = BOARD_LAND_WIDTH;
   if(r === BOARD_SPAWN_WIDTH) landWidth = r;
 
+  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+
   // green circle
   ctx.beginPath();
   ctx.fillStyle = 'green';
-  ctx.arc(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS, r, 0,2*Math.PI);
+  ctx.arc(0,0, r, 0,2*Math.PI);
   ctx.fill();
 
   // space separators
   ctx.strokeStyle = 'white';
   for(let i=0; i<spaces; i++){
     // add rotation
-    ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
     ctx.rotate(Math.PI*2/spaces);
-    ctx.translate(-BOARD_PIXEL_RADIUS,-BOARD_PIXEL_RADIUS);
-
+    
     // draw line
     ctx.beginPath();
-    ctx.moveTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r + landWidth);
-    ctx.lineTo(BOARD_PIXEL_RADIUS, BOARD_PIXEL_RADIUS - r);
+    ctx.moveTo(0, landWidth-r);
+    ctx.lineTo(0, -r);
     ctx.stroke();
   }
 }
