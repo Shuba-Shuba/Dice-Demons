@@ -19,10 +19,6 @@ html, body {
   z-index: 100;
 }
 
-#menu a {
-  display: contents;
-}
-
 #menu button {
   flex: 1 1;
   height: 4em;
@@ -70,7 +66,7 @@ html, body {
 }
 
 #board {
-  --board-size: min(calc(100vw - 2*var(--page-margin)), calc(100vh - 2*var(--page-margin) - 4em - 10px));
+  --board-size: min(calc(100vw - 2*var(--page-margin)), max(500px,calc(100vh - 2*var(--page-margin) - 4em - 10px)));
 }
 
 canvas.board {
