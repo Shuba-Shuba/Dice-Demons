@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html, body {
   height: 100vh;
   margin: 0;
@@ -47,12 +51,12 @@ html, body {
 .page.flex.selected {
   display: flex;
   flex-flow: column;
-  height: calc(100% - var(--page-margin));
+  height: calc(100% - 2*var(--page-margin));
 }
 
 #chat .chat-input {
   flex: 0 1 auto;
-  margin: 0 0 var(--page-margin)
+  margin: var(--page-margin) 0 0;
 }
 
 #chat-messages {
@@ -61,17 +65,21 @@ html, body {
   word-wrap: break-word;
   scroll-behavior: smooth;
   padding: 0 var(--page-margin);
-  margin: 0 0 var(--page-margin);
   border: 1px solid black;
 }
 
+#game {
+  align-items: center;
+}
+
 #board {
-  --board-size: min(calc(100vw - 2*var(--page-margin)), max(500px,calc(100vh - 2*var(--page-margin) - 4em - 10px)));
+  --board-size: min(calc(100vw), calc(100vh - var(--page-margin) - 4em - 26px));
+  width: var(--board-size);
+  height: var(--board-size);
 }
 
 canvas.board {
   position: absolute;
-  left: calc(50vw - var(--board-size)/2);
-  width: var(--board-size);
-  height: var(--board-size);
+  width: inherit;
+  height: inherit;
 }
