@@ -83,7 +83,7 @@ function setupBoard() {
   spawn.classList.add('board');
   spawn.id = 'spawn';
   spawn.style.rotate = '0deg';
-  spawn.style.zIndex = -1;
+  spawn.style.zIndex = 99;
   spawn.width = BOARD_PIXEL_RADIUS*2;
   spawn.height = BOARD_PIXEL_RADIUS*2;
   drawLandRing(spawn.getContext('2d'), BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
@@ -97,7 +97,7 @@ function setupBoard() {
     bridgeCanvas.classList.add('board');
     bridgeCanvas.id = `bridge${i}`;
     bridgeCanvas.style.rotate = '0deg';
-    bridgeCanvas.style.zIndex = -2*i;
+    bridgeCanvas.style.zIndex = 100 - 2*i;
     bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
     bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
     drawBridgeRing(bridgeCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
@@ -107,7 +107,7 @@ function setupBoard() {
     landCanvas.classList.add('board');
     landCanvas.id = `land${i}`;
     landCanvas.style.rotate = '0deg';
-    landCanvas.style.zIndex = -2*i - 1;
+    landCanvas.style.zIndex = 99 - 2*i;
     landCanvas.width = BOARD_PIXEL_RADIUS*2;
     landCanvas.height = BOARD_PIXEL_RADIUS*2;
     drawLandRing(landCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));

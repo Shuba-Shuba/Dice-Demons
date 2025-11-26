@@ -79,31 +79,3 @@ canvas.board {
   width: var(--board-size);
   height: var(--board-size);
 }
-
-#spawn {
-  z-index: 7;
-}
-
-#bridge1 {
-  z-index: 6;
-}
-
-#land1 {
-  z-index: 5;
-}
-
-#bridge2 {
-  z-index: 4;
-}
-
-#land2 {
-  z-index: 3;
-}
-
-#bridge3 {
-  z-index: 2;
-}
-
-#land3 {
-  z-index: 1;
-}
