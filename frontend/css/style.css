@@ -110,6 +110,10 @@ canvas.board {
     height: 100%;
     overflow: auto;
   }
+
+  .page {
+    --page-margin: 0.25em;
+  }
 }
 
 @media (min-aspect-ratio: 2) and (min-height: 500px) {
