@@ -5,6 +5,14 @@ const socketIO = require('socket.io');
 const {parse} = require('cookie');
 const crypto = require('crypto');
 
+const domain = 'shubashuba.com';
+const appUnsecured = express();
+// redirect every single incoming http request to https
+appUnsecured.use(function(req, res) {
+  res.redirect(301, 'https://' + domain + req.originalUrl);
+});
+appUnsecured.listen(80);
+
 const app = express();
 const options = {
   key: fs.readFileSync("privkey.pem"),
