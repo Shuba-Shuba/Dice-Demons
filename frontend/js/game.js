@@ -16,6 +16,29 @@ setupBoard();
 setupChat();
 
 
+function resizeLoad() {
+  // check board size every ~10ms until it stops returning 0
+  if(document.getElementById('board').getBoundingClientRect().width === 0){
+    return setTimeout(resizeLoad, 0);
+  }
+  resize();
+}
+
+function resize() {
+  const a = document.querySelectorAll('canvas.board');
+  let boardSize = Math.round(Math.min(document.getElementById('board').getBoundingClientRect().width,document.getElementById('board').getBoundingClientRect().height));
+  if(boardSize % 2 === 0) boardSize -= 1;
+  const px = boardSize + 'px';
+  for(let i=0; i<a.length; i++){
+    const c = a[i];
+
+    if(c.style.width === px) return;
+    
+    c.style.width = px;
+    c.style.height = px;
+  }
+}
+
 function setCookie(key, value) {
   // lasts up to 24 hours
   document.cookie = `${key}=${value};max-age=86400;path=/`;
@@ -113,6 +136,9 @@ function setupBoard() {
     drawLandRing(landCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
     document.getElementById('board').appendChild(landCanvas);
   }
+
+  addEventListener('resize', resize);
+  addEventListener('load', resizeLoad, {once: true});
 }
 
 function drawBridgeRing(ctx, r, spaces) {
