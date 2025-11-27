@@ -112,7 +112,7 @@ canvas.board {
   }
 }
 
-@media (min-aspect-ratio: 2) {
+@media (min-aspect-ratio: 2) and (min-height: 500px) {
   #game.selected {
     grid-auto-columns: 1fr max-content 1fr;
     grid-template-areas: 
@@ -121,13 +121,13 @@ canvas.board {
   }
 }
 
-@media (max-aspect-ratio: 2/1) and (min-aspect-ratio: 5/4) {
+@media ((max-aspect-ratio: 2) or (max-height: 500px)) and (min-aspect-ratio: 5/4) {
   #game.selected {
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: max-content 1fr;
     grid-auto-rows: calc(50% - var(--page-margin)/2);
     grid-template-areas: 
-      'l b'
-      'r b';
+      'b l'
+      'b r';
   }
 }
 
