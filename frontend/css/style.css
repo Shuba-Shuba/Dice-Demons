@@ -37,6 +37,7 @@ html, body {
 #content {
   flex: 1 1 auto;
   min-height: 0;
+  container: content / size;
 }
 
 .page:not(.selected) {
@@ -96,7 +97,7 @@ canvas.board {
   grid-area: r;
 }
 
-@media (max-height: 500px) {
+@media (height < 500px) {
   #container {
     flex-flow: row;
   }
@@ -116,7 +117,7 @@ canvas.board {
   }
 }
 
-@media (aspect-ratio > 2) and (min-height: 500px) {
+@container content (aspect-ratio > 2) {
   #game.selected {
     grid-auto-columns: 1fr max-content 1fr;
     grid-template-areas: 
@@ -125,9 +126,9 @@ canvas.board {
   }
 }
 
-@media ((aspect-ratio <= 2) or (max-height: 500px)) and (aspect-ratio > 5/4) {
+@container content (5/4 < aspect-ratio <= 2) {
   #game.selected {
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: max-content auto;
     grid-auto-rows: 1fr;
     height: 100%;
     grid-template-areas: 
@@ -136,20 +137,9 @@ canvas.board {
   }
 }
 
-@media (aspect-ratio <= 5/4) and (aspect-ratio > 1) {
+@container content (1 < aspect-ratio <= 5/4) {
   #game.selected {
-    grid-auto-columns: 1fr fit-content;
-    grid-template-areas: 
-      'l b'
-      'l r';
-    grid-auto-rows: 1fr;
-    height: 100%;
-  }
-}
-
-@media (aspect-ratio <= 1) and (aspect-ratio > 4/5) {
-  #game.selected {
-    grid-auto-columns: 1fr fit-content;
+    grid-auto-columns: 3fr 4fr;
     grid-template-areas: 
       'l b'
       'r r';
@@ -158,7 +148,18 @@ canvas.board {
   }
 }
 
-@media (aspect-ratio <= 4/5) and (aspect-ratio > 1/2) {
+@container content (3/4 < aspect-ratio <= 1) {
+  #game.selected {
+    grid-auto-columns: 3fr 4fr;
+    grid-template-areas: 
+      'l b'
+      'l r';
+    grid-auto-rows: 1fr;
+    height: 100%;
+  }
+}
+
+@container content (1/2 < aspect-ratio <= 3/4) {
   #game.selected {
     grid-template-rows: max-content 1fr;
     grid-auto-columns: 1fr;
@@ -174,7 +175,7 @@ canvas.board {
   }
 }
 
-@media (aspect-ratio <= 1/2) {
+@container content (aspect-ratio <= 1/2) {
   #game.selected {
     grid-template-rows: max-content 1fr 1fr;
     grid-template-areas: 
