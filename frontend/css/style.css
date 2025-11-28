@@ -97,7 +97,7 @@ canvas.board {
   grid-area: r;
 }
 
-@media (height < 500px) {
+@media (orientation: landscape) {
   #container {
     flex-flow: row;
   }
@@ -105,15 +105,16 @@ canvas.board {
   #menu {
     flex-flow: column;
     width: min-content;
+    padding: 0 0 10px 0;
+  }
+
+  #menu button {
+    margin: 10px 10px 0 10px;
   }
 
   #rules {
     height: 100%;
     overflow: auto;
-  }
-
-  .page {
-    --page-margin: 0.25em;
   }
 }
 
