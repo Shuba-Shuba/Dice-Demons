@@ -21,6 +21,9 @@ function resizeLoad() {
   if(document.getElementById('board').getBoundingClientRect().width === 0){
     return setTimeout(resizeLoad, 0);
   }
+  document.querySelectorAll('#menu button').forEach((e) => {
+    e.addEventListener('click', resize);
+  });
   resize();
 }
 
