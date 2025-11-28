@@ -45,7 +45,7 @@ html, body {
 }
 
 .page {
-  --page-margin: 1em;
+  --page-margin: 2vmin;
   padding: var(--page-margin);
 }
 
