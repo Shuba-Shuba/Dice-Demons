@@ -15,6 +15,9 @@ setupSocket();
 setupBoard();
 setupChat();
 
+addEventListener('resize', resize);
+addEventListener('load', resizeLoad, {once: true});
+
 
 function resizeLoad() {
   // check board size every ~10ms until it stops returning 0
@@ -139,9 +142,6 @@ function setupBoard() {
     drawLandRing(landCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
     document.getElementById('board').appendChild(landCanvas);
   }
-
-  addEventListener('resize', resize);
-  addEventListener('load', resizeLoad, {once: true});
 }
 
 function drawBridgeRing(ctx, r, spaces) {
