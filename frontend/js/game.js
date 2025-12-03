@@ -12,11 +12,8 @@ const socket = io();
 
 
 setupSocket();
-setupBoard();
+setupGame();
 setupChat();
-
-addEventListener('resize', resize);
-addEventListener('load', resizeLoad, {once: true});
 
 
 function resizeLoad() {
@@ -104,6 +101,24 @@ function rotate(element, rotation) {
 
   // update rotation value
   element.style.rotate = newRotation;
+}
+
+function clickDice() {
+  // get 3 dice rolls sorted in descending order
+  const rolls = [];
+  for(let i=0; i<3; i++){rolls.push(Math.floor(Math.random()*6) + 1)};
+  rolls.sort((a,b) => b-a);
+  
+  for(let i=0; i<3; i++){
+    rolls[i]
+  }
+}
+
+function setupGame() {
+  setupBoard();
+  addEventListener('resize', resize);
+  addEventListener('load', resizeLoad, {once: true});
+  document.getElementById('dice-container').addEventListener('click', clickDice);
 }
 
 function setupBoard() {

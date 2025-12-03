@@ -97,6 +97,31 @@ canvas.board {
   grid-area: r;
 }
 
+#dice-container {
+  border: 1px solid black;
+  display: flex;
+  flex-flow: row;
+  width: 100%;
+}
+
+.dice {
+  flex: 1 1 auto;
+  aspect-ratio: 1/1;
+  margin: 1vmin;
+}
+
+#dice-player {
+  background-color: aqua;
+}
+
+#dice-bridge {
+  background-color: lime;
+}
+
+#dice-monster {
+  background-color: darkred;
+}
+
 @media (orientation: landscape) {
   #container {
     flex-flow: row;
