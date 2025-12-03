@@ -20,8 +20,7 @@ html, body {
   top: 0;
   display: flex;
   padding: 10px;
-  column-gap: 10px;
-  row-gap: 10px;
+  gap: 10px;
   z-index: 100;
 }
 
@@ -102,7 +101,7 @@ canvas.board {
   border: 1px solid black;
   display: flex;
   flex-flow: row;
-  column-gap: 1vmin;
+  gap: 1vmin;
   padding: 1vmin;
   width: 100%;
 }
