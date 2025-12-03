@@ -103,14 +103,15 @@ function rotate(element, rotation) {
   element.style.rotate = newRotation;
 }
 
-function clickDice() {
+function rollDice() {
   // get 3 dice rolls sorted in descending order
   const rolls = [];
   for(let i=0; i<3; i++){rolls.push(Math.floor(Math.random()*6) + 1)};
   rolls.sort((a,b) => b-a);
   
+  const dice = document.getElementById('dice-container').children;
   for(let i=0; i<3; i++){
-    rolls[i]
+    dice[i].innerHTML = rolls[i];
   }
 }
 
@@ -118,7 +119,7 @@ function setupGame() {
   setupBoard();
   addEventListener('resize', resize);
   addEventListener('load', resizeLoad, {once: true});
-  document.getElementById('dice-container').addEventListener('click', clickDice);
+  document.getElementById('dice-container').addEventListener('click', rollDice);
 }
 
 function setupBoard() {
