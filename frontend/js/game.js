@@ -106,9 +106,10 @@ function rotate(element, rotation) {
 function rollDice() {
   // get 3 dice rolls sorted in descending order
   const rolls = [];
-  for(let i=0; i<3; i++){rolls.push(Math.floor(Math.random()*6) + 1)};
+  for(let i=0; i<3; i++) rolls.push(Math.floor(Math.random()*6) + 1);
   rolls.sort((a,b) => b-a);
   
+  // show rolls on screen
   const dice = document.getElementById('dice-container').children;
   for(let i=0; i<3; i++){
     dice[i].innerHTML = rolls[i];
