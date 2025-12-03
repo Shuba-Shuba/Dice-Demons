@@ -144,7 +144,11 @@ function setupBoard() {
     bridgeCanvas.style.zIndex = 100 - 2*i;
     bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
     bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
-    drawBridgeRing(bridgeCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
+    drawBridgeRing(
+      bridgeCanvas.getContext('2d'),
+      BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH,
+      BOARD_SPAWN_SPACES*Math.pow(2, i)
+    );
     document.getElementById('board').appendChild(bridgeCanvas);
 
     const landCanvas = document.createElement('canvas');
@@ -154,7 +158,11 @@ function setupBoard() {
     landCanvas.style.zIndex = 99 - 2*i;
     landCanvas.width = BOARD_PIXEL_RADIUS*2;
     landCanvas.height = BOARD_PIXEL_RADIUS*2;
-    drawLandRing(landCanvas.getContext('2d'), BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH, BOARD_SPAWN_SPACES*Math.pow(2, i));
+    drawLandRing(
+      landCanvas.getContext('2d'),
+      BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH,
+      BOARD_SPAWN_SPACES*Math.pow(2, i)
+    );
     document.getElementById('board').appendChild(landCanvas);
   }
 }
@@ -260,9 +268,9 @@ function setupChat() {
   // enter key submits chat input
   document.getElementById('chat').onkeydown = (e) => {
     if(
-      e.key === 'Enter' &&
-      e.target.tagName === 'INPUT' &&
-      e.target.parentElement.classList.contains('chat-input')
+      e.key === 'Enter' 
+      && e.target.tagName === 'INPUT'
+      && e.target.parentElement.classList.contains('chat-input')
     ){
       e.target.parentElement.querySelector('button').click();
     }
