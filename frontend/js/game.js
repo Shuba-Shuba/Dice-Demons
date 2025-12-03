@@ -112,7 +112,7 @@ function rollDice() {
   // show rolls on screen
   const dice = document.getElementById('dice-container').children;
   for(let i=0; i<3; i++){
-    dice[i].innerHTML = rolls[i];
+    dice[i].innerHTML = `${rolls[i]}`;
   }
 }
 
