@@ -91,6 +91,18 @@ html, body {
   text-align: center;
 }
 
+#lobby-buttons {
+  width: 100%;
+  display: flex;
+  flex-flow: row;
+  gap: 1em;
+}
+
+#lobby-buttons button {
+  flex: 1 1 auto;
+  padding: 2em;
+}
+
 #lobby-rooms {
   width: 100%;
   flex: 1 1 auto;

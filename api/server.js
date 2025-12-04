@@ -42,6 +42,7 @@ for(const page in pages){
 // socket.emit -> specific client
 
 const connectedClients = {};
+const gameRooms = [];
 
 io.on('connection', (socket) => {
   // connection setup
