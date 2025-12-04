@@ -44,4 +44,7 @@ function menuButton(){
 
   history.pushState(null, document.title, `/${this.id.substring(0,this.id.length-11)}`);
   dispatchEvent(new Event('popstate'));
+
+  // chat menu button instantly scrolls down to bottom (most recent) message
+  if(this.id === 'chat-menubutton') document.getElementById('chat-messages').children[document.getElementById('chat-messages').children.length-1].scrollIntoView({behavior: 'instant'});
 }
