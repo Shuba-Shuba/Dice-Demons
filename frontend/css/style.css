@@ -27,7 +27,6 @@ html, body {
 #menu button {
   flex: 1 1;
   height: 4em;
-  cursor: pointer;
 }
 
 #menu button.selected {
@@ -84,15 +83,60 @@ html, body {
   height: 100%;
   gap: var(--page-margin);
   padding: inherit;
+  align-items: center;
+}
+
+#game-lobby h1 {
+  margin: 0;
 }
 
 #lobby-rooms {
   flex: 1 1 auto;
   overflow: auto;
-  word-wrap: break-word;
   scroll-behavior: smooth;
-  padding: 0 var(--page-margin);
+  padding: 5px;
   border: 1px solid black;
+  display: flex;
+  flex-flow: column;
+  gap: 5px;
+  justify-content: flex-start;
+}
+
+.lobby-room {
+  border: 1px solid black;
+  width: 100%;
+  flex: 0 0 max-content;
+  overflow: hidden;
+  display: flex;
+  flex-flow: row;
+  align-items: stretch;
+  gap: 1em;
+  padding: 1em;
+}
+
+.lobby-room-players {
+  flex: 1;
+  border: 1px solid black;
+  white-space: nowrap;
+  overflow: hidden;
+  display: grid;
+  grid-template: repeat(4,1fr) / auto;
+  grid-auto-flow: column dense;
+  column-gap: 1em;
+}
+
+.lobby-room p,h4 {
+  margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.lobby-room-info {
+  flex: 0 0 20%;
+  display: flex;
+  flex-flow: column;
+  text-align: center;
+  justify-content: center;
 }
 
 #game-content.shown {
