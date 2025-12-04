@@ -44,6 +44,7 @@ for(const page in pages){
 const connectedClients = {};
 
 io.on('connection', (socket) => {
+  // connection setup
   socket.data = getCookies(socket);
 
   if(!connectedClients[socket.data.id]){
@@ -66,7 +67,7 @@ io.on('connection', (socket) => {
   }
   console.log(connectedClients);
 
-
+  // connection handlers
   socket.on('disconnect', () => {
     connectedClients[socket.data.id].tabs -= 1;
     if(connectedClients[socket.data.id].tabs === 0){
@@ -85,6 +86,7 @@ io.on('connection', (socket) => {
     }
   });
   
+  // chat handlers
   socket.on('createMessage', (message) => {
     if(!connectedClients[socket.data.id]) return invalidID('createMessage');
     
@@ -105,6 +107,14 @@ io.on('connection', (socket) => {
     connectedClients[socket.data.id].username = username;
     socket.data.username = username;
     console.log(connectedClients);
+  });
+
+  // game handlers
+  socket.on('rollDice', () => {
+    const rolls = [];
+    for(let i=0; i<3; i++) rolls.push(Math.floor(Math.random()*6) + 1);
+    rolls.sort((a,b) => b-a);
+    io.emit('rollDice', rolls);
   });
 });
 

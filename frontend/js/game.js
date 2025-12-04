@@ -57,18 +57,15 @@ function getCookie(key) {
 }
 
 function setupSocket() {
+  // connections
   socket.on('disconnect', () => {
     receiveMessage('Disconnected from server');
   });
   socket.on('connect', () => {
     receiveMessage('Connected to server');
   });
-  socket.on('chatMessage', (msg) => {
-    receiveMessage(`<${msg.from}> ${msg.text}`);
-  });
-  socket.on('serverMessage', (msg) => {
-    receiveMessage(`${msg.text}`);
-  });
+
+  // ID
   socket.on('generateID', (id) => {
     setCookie('id', id);
     console.log('got ID from server: ', id);
@@ -76,6 +73,23 @@ function setupSocket() {
     // quasi-unique default username
     document.getElementById('username-input-text').value = "unnamed" + (id%1000);
     setUsername();
+  });
+
+  // chat
+  socket.on('chatMessage', (msg) => {
+    receiveMessage(`<${msg.from}> ${msg.text}`);
+  });
+  socket.on('serverMessage', (msg) => {
+    receiveMessage(`${msg.text}`);
+  });
+
+  // game
+  socket.on('rollDice', (rolls) => {
+    // show rolls on screen
+    const dice = document.getElementById('dice-container').children;
+    for(let i=0; i<3; i++){
+      dice[i].innerHTML = `${rolls[i]}`;
+    }
   });
 }
 
@@ -104,16 +118,8 @@ function rotate(element, rotation) {
 }
 
 function rollDice() {
-  // get 3 dice rolls sorted in descending order
-  const rolls = [];
-  for(let i=0; i<3; i++) rolls.push(Math.floor(Math.random()*6) + 1);
-  rolls.sort((a,b) => b-a);
-  
-  // show rolls on screen
-  const dice = document.getElementById('dice-container').children;
-  for(let i=0; i<3; i++){
-    dice[i].innerHTML = `${rolls[i]}`;
-  }
+  // server-side
+  socket.emit('rollDice');
 }
 
 function setupGame() {
