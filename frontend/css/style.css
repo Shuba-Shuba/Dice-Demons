@@ -88,9 +88,11 @@ html, body {
 
 #game-lobby h1 {
   margin: 0;
+  text-align: center;
 }
 
 #lobby-rooms {
+  width: 100%;
   flex: 1 1 auto;
   overflow: auto;
   scroll-behavior: smooth;
@@ -104,8 +106,7 @@ html, body {
 
 .lobby-room {
   border: 1px solid black;
-  width: 100%;
-  flex: 0 0 max-content;
+  flex: 0 0 8em;
   overflow: hidden;
   display: flex;
   flex-flow: row;
@@ -119,9 +120,8 @@ html, body {
   border: 1px solid black;
   white-space: nowrap;
   overflow: hidden;
-  display: grid;
-  grid-template: repeat(4,1fr) / auto;
-  grid-auto-flow: column dense;
+  display: flex;
+  flex-flow: column wrap;
   column-gap: 1em;
 }
 
