@@ -1,3 +1,41 @@
+class Game {
+  constructor(name) {
+    this.started = false;
+    this.name = String(name);
+    this.players = [];
+    this.gameState = {};
+  }
+
+  get lobbyData() {
+    // only include data worth showing on lobby
+    return {
+      started: this.started,
+      name: this.name,
+      players: this.players,
+    }
+  }
+
+  removePlayer(id) {
+    for(let i=0; i<this.players.length; i++){
+      if(this.players[i].id === id){
+        this.players.splice(i,1);
+        break;
+      };
+    }
+  }
+
+  getPlayer(id) {
+    return this.players.find(player => player.id === id);
+  }
+}
+
+class Player {
+  constructor(username, id) {
+    this.username = username;
+    this.id = id;
+  }
+}
+
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
@@ -43,6 +81,7 @@ for(const page in pages){
 
 const connectedClients = {};
 const gameRooms = [];
+const words = JSON.parse(fs.readFileSync("words.json", "utf-8"));
 
 io.on('connection', (socket) => {
   // connection setup
@@ -85,6 +124,11 @@ io.on('connection', (socket) => {
       });
       console.log(connectedClients);
     }
+  });
+
+  // lobby handlers
+  socket.on('createGame', () => {
+    const game = new Game(generateGameName());
   });
   
   // chat handlers
@@ -163,4 +207,8 @@ function getCookies(socket) {
 // hopefully this never runs
 function invalidID(req) {
   console.error(`Received ${req} request for invalid ID`);
+}
+
+function generateGameName() {
+  
 }
