@@ -2,16 +2,35 @@
     "adjectives": [
         "Stupid",
         "Whiny",
-        "Foolish"
+        "Foolish",
+        "Flustered",
+        "Gooey",
+        "Baby",
+        "Ugly",
+        "Hot",
+        "Intoxicated",
+        "Sticky"
     ],
     "things": [
         "Horse",
         "Goo",
-        "Dog"
+        "Dog",
+        "Cat",
+        "Liquid",
+        "Stepfamily",
+        "In-law",
+        "Wife",
+        "Husband",
+        "Baby",
+        "Money"
     ],
     "doers": [
         "Touchers",
         "Buyers",
-        "Eaters"
+        "Eaters",
+        "Lickers",
+        "Suckers",
+        "Beaters",
+        "Killers"
     ]
 }

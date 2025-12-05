@@ -129,6 +129,7 @@ io.on('connection', (socket) => {
   // lobby handlers
   socket.on('createGame', () => {
     const game = new Game(generateGameName());
+    socket.emit('createGame', generateGameName());
   });
   
   // chat handlers
@@ -204,11 +205,14 @@ function getCookies(socket) {
   return cookieObj;
 }
 
+
 // hopefully this never runs
 function invalidID(req) {
   console.error(`Received ${req} request for invalid ID`);
 }
 
+
+// returns 3 random words: adjective noun verb+ers
 function generateGameName() {
-  
+  return words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + " " + words.things[Math.floor(Math.random()*words.things.length)] + " " + words.doers[Math.floor(Math.random()*words.doers.length)];
 }

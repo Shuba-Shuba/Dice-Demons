@@ -91,6 +91,9 @@ function setupSocket() {
       dice[i].innerHTML = `${rolls[i]}`;
     }
   });
+  socket.on('createGame', (txt) => {
+    receiveMessage(txt);
+  })
 }
 
 function rotate(element, rotation) {
