@@ -1,3 +1,11 @@
+const express = require('express');
+const https = require('https');
+const fs = require('fs');
+const socketIO = require('socket.io');
+const {parse} = require('cookie');
+const crypto = require('crypto');
+const path = require('path');
+
 class Game {
   constructor(name) {
     this.started = false;
@@ -11,37 +19,30 @@ class Game {
     return {
       started: this.started,
       name: this.name,
-      players: this.players,
+      players: this.players.map(player => player.username)
     }
   }
 
   removePlayer(id) {
-    for(let i=0; i<this.players.length; i++){
-      if(this.players[i].id === id){
-        this.players.splice(i,1);
-        break;
-      };
-    }
+    this.players.splice(this.players.findIndex(player => id === player.id),1);
   }
 
   getPlayer(id) {
     return this.players.find(player => player.id === id);
   }
-}
 
-class Player {
-  constructor(username, id) {
-    this.username = username;
-    this.id = id;
+  addPlayer(player) {
+    this.players.push(player);
   }
 }
 
-const express = require('express');
-const https = require('https');
-const fs = require('fs');
-const socketIO = require('socket.io');
-const {parse} = require('cookie');
-const crypto = require('crypto');
+class Player {
+  constructor(data) {
+    this.id = data.id;
+    this.username = data.username;
+    this.tabs = 1;
+  }
+}
 
 const domain = 'shubashuba.com';
 const appUnsecured = express();
@@ -61,7 +62,6 @@ const io = new socketIO.Server(server);
 const PORT = 443;
 
 const pages = JSON.parse(fs.readFileSync("../frontend/pages.json", "utf-8"));
-const path = require('path');
 
 // frontend
 // home page
@@ -80,46 +80,44 @@ for(const page in pages){
 // socket.emit -> specific client
 
 const connectedClients = {};
-const gameRooms = [];
+const games = [];
 const words = JSON.parse(fs.readFileSync("words.json", "utf-8"));
 
 io.on('connection', (socket) => {
   // connection setup
-  socket.data = getCookies(socket);
+  const player = new Player(getCookies(socket));
+  socket.data.player = player;
 
-  if(!connectedClients[socket.data.id]){
+  if(!connectedClients[player.id]){
     // first connection
-    connectedClients[socket.data.id] = {
-      username: socket.data.username,
-      tabs: 1
-    };
+    connectedClients[player.id] = player;
     socket.broadcast.emit('serverMessage', {
-      text: `${socket.data.username} joined`,
+      text: `${player.username} joined`,
       createdAt: Date.now()
     });
   } else {
     // reconnection
     socket.broadcast.emit('serverMessage', {
-      text: `${socket.data.username} opened an extra tab`,
+      text: `${player.username} opened an extra tab`,
       createdAt: Date.now()
     });
-    connectedClients[socket.data.id].tabs += 1;
+    connectedClients[player.id].tabs += 1;
   }
   console.log(connectedClients);
 
   // connection handlers
   socket.on('disconnect', () => {
-    connectedClients[socket.data.id].tabs -= 1;
-    if(connectedClients[socket.data.id].tabs === 0){
+    connectedClients[socket.data.player.id].tabs -= 1;
+    if(connectedClients[socket.data.player.id].tabs === 0){
       socket.broadcast.emit('serverMessage', {
-        text: `${socket.data.username} disconnected`,
+        text: `${player.username} disconnected`,
         createdAt: Date.now()
       });
-      delete connectedClients[socket.data.id];
+      delete connectedClients[socket.data.player.id];
       console.log(connectedClients);
     } else {
       socket.broadcast.emit('serverMessage', {
-        text: `${socket.data.username} closed an extra tab`,
+        text: `${socket.data.player.username} closed an extra tab`,
         createdAt: Date.now()
       });
       console.log(connectedClients);
@@ -129,29 +127,35 @@ io.on('connection', (socket) => {
   // lobby handlers
   socket.on('createGame', () => {
     const game = new Game(generateGameName());
-    socket.emit('createGame', generateGameName());
+    socket.emit('serverMessage', {text: game.name});
+    games.push(game);
+    game.addPlayer(socket.data.player);
+    console.log(game);
+  });
+  socket.on('getGames', () => {
+    socket.emit('getGames', games.map(game => game.lobbyData));
   });
   
   // chat handlers
   socket.on('createMessage', (message) => {
-    if(!connectedClients[socket.data.id]) return invalidID('createMessage');
+    if(!connectedClients[socket.data.player.id]) return invalidID('createMessage');
     
     io.emit('chatMessage', {
-      from: socket.data.username,
+      from: socket.data.player.username,
       text: message.text,
       createdAt: message.createdAt
     });
   });
 
   socket.on('setUsername', (username) => {
-    if(!connectedClients[socket.data.id]) return invalidID('setUsername');
+    if(!connectedClients[socket.data.player.id]) return invalidID('setUsername');
     
     socket.broadcast.emit('serverMessage', {
-      text: `${connectedClients[socket.data.id].username} changed their username to ${username}`,
+      text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });
-    connectedClients[socket.data.id].username = username;
-    socket.data.username = username;
+    connectedClients[socket.data.player.id].username = username;
+    socket.data.player.username = username;
     console.log(connectedClients);
   });
 
@@ -212,7 +216,19 @@ function invalidID(req) {
 }
 
 
-// returns 3 random words: adjective noun verb+ers
+// returns random unique game name
 function generateGameName() {
-  return words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + " " + words.things[Math.floor(Math.random()*words.things.length)] + " " + words.doers[Math.floor(Math.random()*words.doers.length)];
+  // get 3 random words: adjective noun verb+ers
+  const name = words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + " " + words.things[Math.floor(Math.random()*words.things.length)] + " " + words.doers[Math.floor(Math.random()*words.doers.length)];
+  
+  // do not repeat
+  if(games.find(game => game.name === name)){
+    // count up if all names exhausted
+    if(words.doers.length * words.things.length * words.adjectives.length <= games.length){
+      console.error('GAME NAMES EXHAUSTED');
+      return "Game #" + games.length;
+    }
+    return generateGameName();
+  }
+  return name;
 }

@@ -12,6 +12,7 @@ const socket = io();
 
 
 setupSocket();
+setupLobby();
 setupGame();
 setupChat();
 
@@ -75,6 +76,16 @@ function setupSocket() {
     setUsername();
   });
 
+  // lobby
+  socket.on('getGames', (games) => {
+    if(games.length === 0) return document.getElementById('lobby-rooms').innerHTML = 'No games found on server :('
+
+    document.getElementById('lobby-rooms').innerHTML = '';
+    for(let i=0; i<games.length; i++){
+      showGame(games[i]);
+    }
+  });
+
   // chat
   socket.on('chatMessage', (msg) => {
     receiveMessage(`<${msg.from}> ${msg.text}`);
@@ -91,9 +102,6 @@ function setupSocket() {
       dice[i].innerHTML = `${rolls[i]}`;
     }
   });
-  socket.on('createGame', (txt) => {
-    receiveMessage(txt);
-  })
 }
 
 function rotate(element, rotation) {
@@ -123,6 +131,12 @@ function rotate(element, rotation) {
 function rollDice() {
   // server-side
   socket.emit('rollDice');
+}
+
+function setupLobby() {
+  document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
+  document.getElementById('lobby-buttons').children[1].addEventListener('click', getGames);
+  getGames();
 }
 
 function setupGame() {
@@ -292,4 +306,45 @@ function setupChat() {
   if(chatLog !== null) for(const msg in chatLog){
     showMessage(chatLog[msg]);
   }
+}
+
+function showGame(game) {
+  const room = document.createElement('div');
+  room.classList.add('lobby-room');
+  
+  const roomInfo = document.createElement('div');
+  roomInfo.classList.add('lobby-room-info');
+  const roomName = document.createElement('h4');
+  roomName.textContent = game.name;
+  roomInfo.appendChild(roomName);
+  const roomPlayerCount = document.createElement('p');
+  roomPlayerCount.textContent = `${game.players.length} players`;
+  roomInfo.appendChild(roomPlayerCount);
+  room.appendChild(roomInfo);
+
+  const roomPlayers = document.createElement('div');
+  roomPlayers.classList.add('lobby-room-players');
+  for(let i=0; i<game.players.length; i++){
+    const roomPlayer = document.createElement('p');
+    roomPlayer.textContent = game.players[i];
+    roomPlayers.appendChild(roomPlayer);
+  }
+  room.appendChild(roomPlayers);
+
+  const roomJoinButton = document.createElement('button');
+  roomJoinButton.textContent = 'Join Game';
+  roomJoinButton.addEventListener('click', () => socket.emit('joinGame'));
+  room.appendChild(roomJoinButton);
+
+  document.getElementById('lobby-rooms').appendChild(room);
+}
+
+function createGame() {
+  socket.emit('createGame');
+  getGames();
+}
+
+function getGames() {
+  document.getElementById('lobby-rooms').innerHTML = 'loading...';
+  socket.emit('getGames');
 }
