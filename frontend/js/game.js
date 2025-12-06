@@ -294,16 +294,17 @@ function setupChat() {
   if(getCookie('username')) document.getElementById('username-input-text').placeholder = getCookie('username');
   else document.getElementById('username-input-text').placeholder = "unnamed";
 
+  // submit buttons
+  document.getElementById('username-input-send').addEventListener('click', setUsername);
+  document.getElementById('chat-input-send').addEventListener('click', sendMessage);
+
   // enter key submits chat input
-  document.getElementById('chat').onkeydown = (e) => {
-    if(
-      e.key === 'Enter' 
-      && e.target.tagName === 'INPUT'
-      && e.target.parentElement.classList.contains('chat-input')
-    ){
-      e.target.parentElement.querySelector('button').click();
-    }
-  };
+  document.getElementById('username-input-text').addEventListener('keydown', ({key}) => {
+    if(key === 'Enter') setUsername();
+  });
+  document.getElementById('chat-input-text').addEventListener('keydown', ({key}) => {
+    if(key === 'Enter') sendMessage();
+  });
 
   // load chat history from session storage
   var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
