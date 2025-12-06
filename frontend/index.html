@@ -9,20 +9,20 @@
 </head>
 <body>
   <div id="container">
-    <div id="menu"></div>
+    <nav id="menu"></nav>
     <script src="js/menu.js"></script>
     <div id="content">
-      <div class="page" id="game">
-        <div id="game-lobby" class="game-page shown">
+      <div class="page" id="game" hidden>
+        <main id="game-lobby" class="game-page shown">
           <h1>Join or create a game!</h1>
-          <div id="lobby-rooms"></div>
-          <div id="lobby-buttons">
+          <section id="lobby-rooms"></section>
+          <section id="lobby-buttons">
             <button>Create Game</button>
             <button>Refresh</button>
-          </div>
-        </div>
-        <div id="game-content" class="game-page">
-          <div class="game-ui" id="left">
+          </section>
+        </main>
+        <main id="game-content" class="game-page" hidden>
+          <section class="game-ui" id="left">
             <div id="dice-container">
               <div class="dice" id="dice-player"></div>
               <div class="dice" id="dice-bridge"></div>
@@ -42,9 +42,9 @@
             <div class="pp"></div>
             <div class="pp"></div>
             <div class="big-penis"></div>
-          </div>
-          <div id="board"></div>
-          <div class="game-ui" id="right">
+          </section>
+          <section id="board"></section>
+          <section class="game-ui" id="right">
             <div class="penis"></div>
             <div class="big-penis"></div>
             <div class="penis"></div>
@@ -55,10 +55,10 @@
             <div class="pp"></div>
             <div class="big-penis"></div>
             <div class="pp"></div>
-          </div>
-        </div>
+          </section>
+        </main>
       </div>
-      <div class="page" id="rules">
+      <main class="page" id="rules" hidden>
         <h1>Dice is health, strength, and money</h1>
         <h2>Board</h2>
         <p>The board is made up of 2 rings, with a set of bridges between them</p>
@@ -128,9 +128,9 @@
             <li>Losing player loses a die roll’s amount of walls, chosen by the winner</li>
           </ul></li>
         </ol>
-      </div>
-      <div class="page" id="chat">
-        <div id="chat-messages"></div>
+      </main>
+      <main class="page" id="chat" hidden>
+        <section id="chat-messages"></section>
         <div class="chat-input">
           <input type="text" id="username-input-text" placeholder="unnamed">
           <button id="username-input-send">Set Username</button>
@@ -139,7 +139,7 @@
           <input type="text" id="chat-input-text" placeholder="Say something...">
           <button id="chat-input-send"">Send Message</button>
         </div>
-      </div>
+      </main>
     </div>
     <script src="js/game.js"></script>
   </div>

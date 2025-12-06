@@ -314,12 +314,12 @@ function setupChat() {
 }
 
 function showGame(game) {
-  const room = document.createElement('div');
+  const room = document.createElement('article');
   room.classList.add('lobby-room');
   
   const roomInfo = document.createElement('div');
   roomInfo.classList.add('lobby-room-info');
-  const roomName = document.createElement('h4');
+  const roomName = document.createElement('h2');
   roomName.textContent = game.name;
   roomInfo.appendChild(roomName);
   const roomPlayerCount = document.createElement('p');
