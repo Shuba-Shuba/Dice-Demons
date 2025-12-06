@@ -65,6 +65,10 @@ function setupSocket() {
   socket.on('connect', () => {
     receiveMessage('Connected to server');
   });
+  socket.on('error', ({text}) => {
+    console.error('Server sent error:', text);
+    receiveMessage("ERROR: " + text);
+  });
 
   // ID
   socket.on('generateID', (id) => {
@@ -333,7 +337,10 @@ function showGame(game) {
 
   const roomJoinButton = document.createElement('button');
   roomJoinButton.textContent = 'Join Game';
-  roomJoinButton.addEventListener('click', () => socket.emit('joinGame'));
+  roomJoinButton.addEventListener('click', (function({target}){
+    socket.emit('joinGame', this.name);
+    target.textContent = 'Joining...';
+  }).bind(game));
   room.appendChild(roomJoinButton);
 
   document.getElementById('lobby-rooms').appendChild(room);

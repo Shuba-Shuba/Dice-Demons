@@ -42,6 +42,11 @@ class Player {
     this.username = data.username;
     this.tabs = 1;
   }
+  
+  isInAGame(games) {
+    for(let i=0; i<games.length; i++) if(games[i].getPlayer(this. id)) return true;
+    return false;
+  }
 }
 
 const domain = 'shubashuba.com';
@@ -85,25 +90,30 @@ const words = JSON.parse(fs.readFileSync("words.json", "utf-8"));
 
 io.on('connection', (socket) => {
   // connection setup
-  const player = new Player(getCookies(socket));
+  const data = getCookies(socket);
+  const player = getPlayer(data);
+  // if they edit their cookie while offline, use their data
+  player.username = data.username;
+
   socket.data.player = player;
 
   if(!connectedClients[player.id]){
-    // first connection
+    // first tab
     connectedClients[player.id] = player;
+    player.tabs = 1;
     socket.broadcast.emit('serverMessage', {
       text: `${player.username} joined`,
       createdAt: Date.now()
     });
   } else {
-    // reconnection
+    // extra tab
     socket.broadcast.emit('serverMessage', {
       text: `${player.username} opened an extra tab`,
       createdAt: Date.now()
     });
     connectedClients[player.id].tabs += 1;
   }
-  console.log(connectedClients);
+  // console.log(connectedClients);
 
   // connection handlers
   socket.on('disconnect', () => {
@@ -114,23 +124,33 @@ io.on('connection', (socket) => {
         createdAt: Date.now()
       });
       delete connectedClients[socket.data.player.id];
-      console.log(connectedClients);
+      // console.log(connectedClients);
     } else {
       socket.broadcast.emit('serverMessage', {
         text: `${socket.data.player.username} closed an extra tab`,
         createdAt: Date.now()
       });
-      console.log(connectedClients);
+      // console.log(connectedClients);
     }
   });
 
   // lobby handlers
   socket.on('createGame', () => {
+    if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
+
     const game = new Game(generateGameName());
-    socket.emit('serverMessage', {text: game.name});
+    socket.emit('serverMessage', {text: `Created game "${game.name}"`});
     games.push(game);
     game.addPlayer(socket.data.player);
-    console.log(game);
+    // console.log(game);
+  });
+  socket.on('joinGame', (gameName) => {
+    if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
+
+    const game = games.find(game => game.name === gameName);
+    game.addPlayer(socket.data.player);
+    socket.join(gameName);
+    socket.emit('joinedGame', gameName);
   });
   socket.on('getGames', () => {
     socket.emit('getGames', games.map(game => game.lobbyData));
@@ -138,7 +158,7 @@ io.on('connection', (socket) => {
   
   // chat handlers
   socket.on('createMessage', (message) => {
-    if(!connectedClients[socket.data.player.id]) return invalidID('createMessage');
+    if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'createMessage');
     
     io.emit('chatMessage', {
       from: socket.data.player.username,
@@ -148,7 +168,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUsername', (username) => {
-    if(!connectedClients[socket.data.player.id]) return invalidID('setUsername');
+    if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'setUsername');
     
     socket.broadcast.emit('serverMessage', {
       text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
@@ -156,7 +176,7 @@ io.on('connection', (socket) => {
     });
     connectedClients[socket.data.player.id].username = username;
     socket.data.player.username = username;
-    console.log(connectedClients);
+    // console.log(connectedClients);
   });
 
   // game handlers
@@ -210,9 +230,14 @@ function getCookies(socket) {
 }
 
 
-// hopefully this never runs
-function invalidID(req) {
-  console.error(`Received ${req} request for invalid ID`);
+// hopefully these never run
+function errorInvalidID(socket, request) {
+  console.error(`Received ${request} request for invalid ID`);
+  socket.emit('error', {text: "Invalid ID"});
+}
+function errorAlreadyInGame(socket) {
+  console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to join/create a game while already in a game`);
+  socket.emit('error', {text: "Cannot join or create a game while already in a game"});
 }
 
 
@@ -231,4 +256,20 @@ function generateGameName() {
     return generateGameName();
   }
   return name;
+}
+
+
+// looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
+function getPlayer(data) {
+  const id = data.id;
+  if(connectedClients[id]) return connectedClients[id];
+  for(let i=0; i<games.length; i++){
+    const p = games[i].getPlayer(id);
+    if(p){
+      console.log(`found player in ${games[i].name}`);
+      return p;
+    }
+  }
+  console.log("didn't find existing player object");
+  return new Player(data);
 }
