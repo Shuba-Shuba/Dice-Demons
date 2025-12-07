@@ -67,7 +67,7 @@ function setupSocket() {
   });
   socket.on('error', ({text}) => {
     console.error('Server sent error:', text);
-    receiveMessage("ERROR: " + text);
+    alert("ERROR: " + text);
   });
 
   // ID
