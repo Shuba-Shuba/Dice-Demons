@@ -33,9 +33,7 @@ function changePage(){
   document.getElementById(buttonId).classList.add('selected');
 
   // hide old page & show new page
-  document.querySelector('#content .page.selected').hidden = true;
   document.querySelector('#content .page.selected').classList.remove('selected');
-  document.getElementById(pageId).hidden = false;
   document.getElementById(pageId).classList.add('selected');
 }
 
