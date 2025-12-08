@@ -13,15 +13,15 @@
     <script src="js/menu.js"></script>
     <div id="content">
       <div class="page" id="game">
-        <main id="game-lobby" class="game-page shown">
+        <div id="game-lobby" class="game-page shown">
           <h1>Join or create a game!</h1>
           <section id="lobby-rooms"></section>
           <section id="lobby-buttons">
             <button>Create Game</button>
             <button>Refresh</button>
           </section>
-        </main>
-        <main id="game-content" class="game-page">
+        </div>
+        <div id="game-content" class="game-page">
           <section class="game-ui" id="left">
             <div id="dice-container">
               <div class="dice" id="dice-player"></div>
@@ -56,9 +56,9 @@
             <div class="big-penis"></div>
             <div class="pp"></div>
           </section>
-        </main>
+        </div>
       </div>
-      <main class="page" id="rules">
+      <div class="page" id="rules">
         <h1>Dice is health, strength, and money</h1>
         <h2>Board</h2>
         <p>The board is made up of 2 rings, with a set of bridges between them</p>
@@ -128,8 +128,8 @@
             <li>Losing player loses a die roll’s amount of walls, chosen by the winner</li>
           </ul></li>
         </ol>
-      </main>
-      <main class="page" id="chat">
+      </div>
+      <div class="page" id="chat">
         <section id="chat-messages"></section>
         <div class="chat-input">
           <input type="text" id="username-input-text" placeholder="unnamed">
@@ -139,7 +139,7 @@
           <input type="text" id="chat-input-text" placeholder="Say something...">
           <button id="chat-input-send"">Send Message</button>
         </div>
-      </main>
+      </div>
     </div>
     <script src="js/game.js"></script>
   </div>
