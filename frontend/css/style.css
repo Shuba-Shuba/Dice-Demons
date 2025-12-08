@@ -137,10 +137,11 @@ html, body {
   column-gap: 1em;
 }
 
-.lobby-room p,h4 {
+.lobby-room p,h2 {
   margin: 0;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: medium;
 }
 
 .lobby-room-info {
