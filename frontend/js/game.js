@@ -16,6 +16,9 @@ setupLobby();
 setupGame();
 setupChat();
 
+
+// WINDOW
+
 function resize() {
   const a = document.querySelectorAll('canvas.board');
   let boardSize = Math.round(Math.min(document.getElementById('board').getBoundingClientRect().width,document.getElementById('board').getBoundingClientRect().height));
@@ -30,6 +33,9 @@ function resize() {
     c.style.height = px;
   }
 }
+
+
+// SERVER
 
 function setCookie(key, value) {
   // lasts up to 24 hours
@@ -96,6 +102,9 @@ function setupSocket() {
   });
 }
 
+
+// GAME CONTENT
+
 function rotate(element, rotation) {
   // get old rotation
   const oldRotation = element.style.rotate;
@@ -123,12 +132,6 @@ function rotate(element, rotation) {
 function rollDice() {
   // server-side
   socket.emit('rollDice');
-}
-
-function setupLobby() {
-  document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
-  document.getElementById('lobby-buttons').children[1].addEventListener('click', getGames);
-  getGames();
 }
 
 function setupGame() {
@@ -241,6 +244,62 @@ function drawLandRing(ctx, r, spaces) {
   }
 }
 
+
+// GAME LOBBY
+
+function setupLobby() {
+  document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
+  document.getElementById('lobby-buttons').children[1].addEventListener('click', getGames);
+  getGames();
+}
+
+function showGame(game) {
+  const room = document.createElement('article');
+  room.classList.add('lobby-room');
+  
+  const roomInfo = document.createElement('div');
+  roomInfo.classList.add('lobby-room-info');
+  const roomName = document.createElement('h2');
+  roomName.textContent = game.name;
+  roomInfo.appendChild(roomName);
+  const roomPlayerCount = document.createElement('p');
+  roomPlayerCount.textContent = `${game.players.length} players`;
+  roomInfo.appendChild(roomPlayerCount);
+  room.appendChild(roomInfo);
+
+  const roomPlayers = document.createElement('div');
+  roomPlayers.classList.add('lobby-room-players');
+  for(let i=0; i<game.players.length; i++){
+    const roomPlayer = document.createElement('p');
+    roomPlayer.textContent = game.players[i];
+    roomPlayers.appendChild(roomPlayer);
+  }
+  room.appendChild(roomPlayers);
+
+  const roomJoinButton = document.createElement('button');
+  roomJoinButton.textContent = 'Join Game';
+  roomJoinButton.addEventListener('click', (function({target}){
+    socket.emit('joinGame', this.name);
+    target.textContent = 'Joining...';
+  }).bind(game));
+  room.appendChild(roomJoinButton);
+
+  document.getElementById('lobby-rooms').appendChild(room);
+}
+
+function createGame() {
+  socket.emit('createGame');
+  getGames();
+}
+
+function getGames() {
+  document.getElementById('lobby-rooms').innerHTML = 'loading...';
+  socket.emit('getGames');
+}
+
+
+// CHAT
+
 function setUsername() {
   const username = document.getElementById('username-input-text').value;
   document.getElementById('username-input-text').placeholder = username;
@@ -298,48 +357,4 @@ function setupChat() {
   if(chatLog !== null) for(const msg in chatLog){
     showMessage(chatLog[msg]);
   }
-}
-
-function showGame(game) {
-  const room = document.createElement('article');
-  room.classList.add('lobby-room');
-  
-  const roomInfo = document.createElement('div');
-  roomInfo.classList.add('lobby-room-info');
-  const roomName = document.createElement('h2');
-  roomName.textContent = game.name;
-  roomInfo.appendChild(roomName);
-  const roomPlayerCount = document.createElement('p');
-  roomPlayerCount.textContent = `${game.players.length} players`;
-  roomInfo.appendChild(roomPlayerCount);
-  room.appendChild(roomInfo);
-
-  const roomPlayers = document.createElement('div');
-  roomPlayers.classList.add('lobby-room-players');
-  for(let i=0; i<game.players.length; i++){
-    const roomPlayer = document.createElement('p');
-    roomPlayer.textContent = game.players[i];
-    roomPlayers.appendChild(roomPlayer);
-  }
-  room.appendChild(roomPlayers);
-
-  const roomJoinButton = document.createElement('button');
-  roomJoinButton.textContent = 'Join Game';
-  roomJoinButton.addEventListener('click', (function({target}){
-    socket.emit('joinGame', this.name);
-    target.textContent = 'Joining...';
-  }).bind(game));
-  room.appendChild(roomJoinButton);
-
-  document.getElementById('lobby-rooms').appendChild(room);
-}
-
-function createGame() {
-  socket.emit('createGame');
-  getGames();
-}
-
-function getGames() {
-  document.getElementById('lobby-rooms').innerHTML = 'loading...';
-  socket.emit('getGames');
 }
