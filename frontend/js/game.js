@@ -34,7 +34,7 @@ function resize() {
   }
 }
 
-
+// END WINDOW
 // SERVER
 
 function setCookie(key, value) {
@@ -102,7 +102,7 @@ function setupSocket() {
   });
 }
 
-
+// END SERVER
 // GAME CONTENT
 
 function rotate(element, rotation) {
@@ -244,7 +244,7 @@ function drawLandRing(ctx, r, spaces) {
   }
 }
 
-
+// END GAME CONTENT
 // GAME LOBBY
 
 function setupLobby() {
@@ -297,7 +297,7 @@ function getGames() {
   socket.emit('getGames');
 }
 
-
+// END GAME LOBBY
 // CHAT
 
 function setUsername() {
@@ -358,3 +358,5 @@ function setupChat() {
     showMessage(chatLog[msg]);
   }
 }
+
+// END CHAT
