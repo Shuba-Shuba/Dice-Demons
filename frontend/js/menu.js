@@ -3,16 +3,22 @@ fetch('pages.json')
   .then(response => response.json())
   .then(pages => {
     for(var page in pages){
+      // create menu button
       var button = document.createElement('button');
       button.textContent = pages[page].title;
       button.id = pages[page].id + "-menubutton";
       button.addEventListener('click', changePage);
       document.getElementById('menu').appendChild(button);
+
+      // show initial page
       if(pages[page].initial){
         document.getElementById(pages[page].id).classList.add('selected');
         button.classList.add('selected');
-        document.getElementById(pages[page].id).click();
       }
+
+      // fire resize handler on menu load & menu button
+      button.addEventListener('click', resize);
+      resize();
     }
   });
 

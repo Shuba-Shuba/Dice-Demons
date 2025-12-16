@@ -16,18 +16,6 @@ setupLobby();
 setupGame();
 setupChat();
 
-
-function resizeLoad() {
-  // check board size every ~10ms until it stops returning 0
-  if(document.getElementById('board').getBoundingClientRect().width === 0){
-    return setTimeout(resizeLoad, 0);
-  }
-  document.querySelectorAll('#menu button').forEach((e) => {
-    e.addEventListener('click', resize);
-  });
-  resize();
-}
-
 function resize() {
   const a = document.querySelectorAll('canvas.board');
   let boardSize = Math.round(Math.min(document.getElementById('board').getBoundingClientRect().width,document.getElementById('board').getBoundingClientRect().height));
@@ -146,7 +134,6 @@ function setupLobby() {
 function setupGame() {
   setupBoard();
   addEventListener('resize', resize);
-  addEventListener('load', resizeLoad, {once: true});
   document.getElementById('dice-container').addEventListener('click', rollDice);
 }
 
