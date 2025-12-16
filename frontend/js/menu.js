@@ -1,3 +1,5 @@
+const menuLoaded = new Event('menuLoaded');
+
 // create menu buttons
 fetch('pages.json')
   .then(response => response.json())
@@ -8,6 +10,7 @@ fetch('pages.json')
       button.textContent = pages[page].title;
       button.id = pages[page].id + "-menubutton";
       button.addEventListener('click', changePage);
+      button.addEventListener('click', resize);
       document.getElementById('menu').appendChild(button);
 
       // show initial page
@@ -15,11 +18,8 @@ fetch('pages.json')
         document.getElementById(pages[page].id).classList.add('selected');
         button.classList.add('selected');
       }
-
-      // fire resize handler on menu load & menu button
-      button.addEventListener('click', resize);
-      resize();
     }
+    dispatchEvent(menuLoaded);
   });
 
 
