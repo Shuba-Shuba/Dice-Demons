@@ -6,27 +6,20 @@ fetch('pages.json')
       var button = document.createElement('button');
       button.textContent = pages[page].title;
       button.id = pages[page].id + "-menubutton";
-      button.addEventListener('click', menuButton);
+      button.addEventListener('click', changePage);
       document.getElementById('menu').appendChild(button);
       if(pages[page].initial){
         document.getElementById(pages[page].id).classList.add('selected');
         button.classList.add('selected');
-        if(location.href.split('/')[3] === ''){
-          history.replaceState(null, document.title, `/${pages[page].id}`);
-          dispatchEvent(new Event('popstate'));
-        }
+        document.getElementById(pages[page].id).click();
       }
     }
-    addEventListener('popstate', changePage);
-    // remove trailing slash
-    history.replaceState(null, document.title, `/${location.href.split('/')[3]}`);
-    dispatchEvent(new Event('popstate'));
   });
 
 
 function changePage(){
-  const pageId = location.href.split('/')[3];
-  const buttonId = pageId + "-menubutton";
+  const buttonId = this.id;
+  const pageId = buttonId.substring(0, buttonId.length-11);
 
   // unselect old button & select new button
   document.querySelector('#menu button.selected').classList.remove('selected');
@@ -35,16 +28,7 @@ function changePage(){
   // hide old page & show new page
   document.querySelector('#content .page.selected').classList.remove('selected');
   document.getElementById(pageId).classList.add('selected');
-}
-
-
-function menuButton(){
-  // don't do anything if clicked button's page is already the current page
-  if(this.classList.contains('selected')) return;
-
-  history.pushState(null, document.title, `/${this.id.substring(0,this.id.length-11)}`);
-  dispatchEvent(new Event('popstate'));
 
   // chat menu button instantly scrolls down to bottom (most recent) message
-  if(this.id === 'chat-menubutton') document.getElementById('chat-messages').children[document.getElementById('chat-messages').children.length-1].scrollIntoView({behavior: 'instant'});
+  if(buttonId === 'chat-menubutton') document.getElementById('chat-messages').children[document.getElementById('chat-messages').children.length-1].scrollIntoView({behavior: 'instant'});
 }

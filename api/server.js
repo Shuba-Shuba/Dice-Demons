@@ -75,10 +75,6 @@ app.use('/',express.static(path.join(__dirname,'../frontend')));
 app.get('/socket.io/socket.io.js', (req, res) => {
   res.sendFile(path.join(__dirname,'/socket.io/socket.io.js'));
 });
-// fake subdirectories for page navigation
-for(const page in pages){
-  app.use(`/${pages[page].id}`,express.static(path.join(__dirname,'../frontend')));
-}
 
 
 // io.emit -> everyone on server
