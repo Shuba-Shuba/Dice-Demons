@@ -116,16 +116,11 @@ const io = new Server<
   ServerToClientEvents,
   {},
   SocketData
->();
+>(server);
 const PORT = 443;
 
 // frontend
-// home page
 app.use('/',express.static(path.join(__dirname,'../frontend')));
-// socket.io script location is hardcoded
-app.get('/socket.io/socket.io.js', (req, res) => {
-  res.sendFile(path.join(__dirname,'/socket.io/socket.io.js'));
-});
 
 
 // io.emit -> everyone on server
