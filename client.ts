@@ -1,4 +1,4 @@
-import {io, Socket} from "socket.io";
+import {io, Socket} from "socket.io/client-dist/socket.io.esm.min.js"
 
 interface ServerToClientEvents {
   generateID: (id: string) => void;
@@ -40,16 +40,39 @@ const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH
 
 const SPIN_ANIMATION_DURATION = 200;
 
-const socket = io();
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 
 
+setupMenu();
 setupSocket();
 setupLobby();
 setupGame();
 setupChat();
 
 
-// WINDOW
+// WINDOW & NAV
+
+function setupMenu() {
+  // create menu buttons
+  fetch('pages.json')
+    .then(response => response.json())
+    .then(pages => {
+      for(var page in pages){
+        // create menu button
+        var button = document.createElement('button');
+        button.textContent = pages[page].title;
+        button.id = pages[page].id + "-menubutton";
+        button.addEventListener('click', changePage);
+        button.addEventListener('click', resize);
+        document.getElementById('menu').appendChild(button);
+        // show initial page
+        if(pages[page].initial){
+          document.getElementById(pages[page].id).classList.add('selected');
+          button.classList.add('selected');
+        }
+      }
+    });
+}
 
 function resize(): void {
   const a = document.querySelectorAll('canvas.board');
@@ -66,7 +89,23 @@ function resize(): void {
   }
 }
 
-// END WINDOW
+function changePage(){
+  const buttonId = this.id;
+  const pageId = buttonId.substring(0, buttonId.length-11);
+
+  // unselect old button & select new button
+  document.querySelector('#menu button.selected').classList.remove('selected');
+  document.getElementById(buttonId).classList.add('selected');
+
+  // hide old page & show new page
+  document.querySelector('#content .page.selected').classList.remove('selected');
+  document.getElementById(pageId).classList.add('selected');
+
+  // chat menu button instantly scrolls down to bottom (most recent) message
+  if(buttonId === 'chat-menubutton') document.getElementById('chat-messages').children[document.getElementById('chat-messages').children.length-1].scrollIntoView({behavior: 'instant'});
+}
+
+// END WINDOW & NAV
 // SERVER
 
 function setCookie(key: string, value: string): void {

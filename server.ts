@@ -120,7 +120,7 @@ const io = new Server<
 const PORT = 443;
 
 // frontend
-app.use('/',express.static(path.join(__dirname,'../public')));
+app.use(express.static(path.join(__dirname,'public')));
 
 
 // io.emit -> everyone on server

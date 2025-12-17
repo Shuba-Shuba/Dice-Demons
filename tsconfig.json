@@ -1,8 +1,13 @@
 {
     "compilerOptions": {
-        "rootDir": "ts",
-        "outDir": "public/js",
+        "rootDir": ".",
+        "outDir": "public",
         "lib": ["DOM","ES2015"]
     },
-    "include": ["ts/**/*"]
+    "files": [
+        "client.ts"
+    ],
+    "exclude": [
+        "server.ts"
+    ]
 }
