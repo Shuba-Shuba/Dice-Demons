@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "rootDir": "ts",
+        "outDir": "public/js",
+        "lib": ["DOM","ES2015"]
+    },
+    "include": ["ts/**/*"]
+}
