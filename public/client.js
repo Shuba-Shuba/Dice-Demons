@@ -1,3 +1,4 @@
+//#region CONSTANTS
 const BOARD_SPAWN_WIDTH = 100;
 const BOARD_LAND_WIDTH = 100;
 const BOARD_BRIDGE_LENGTH = 100;
@@ -5,20 +6,19 @@ const BOARD_SPAWN_SPACES = 4;
 const BOARD_SPACES_PER_BRIDGE = 8; // spaces counted on outside
 const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
-
 const SPIN_ANIMATION_DURATION = 200;
-
 const socket = io();
+//#endregion
 
-
+//#region RUN SETUP
 setupMenu();
 setupSocket();
 setupLobby();
 setupGame();
 setupChat();
+//#endregion RUN SETUP
 
-
-// WINDOW & NAV
+//#region WINDOW & NAV
 
 function setupMenu() {
   // create menu buttons
@@ -73,8 +73,8 @@ function changePage(){
   if(buttonId === 'chat-menubutton') document.getElementById('chat-messages').children[document.getElementById('chat-messages').children.length-1].scrollIntoView({behavior: 'instant'});
 }
 
-// END WINDOW & NAV
-// SERVER
+//#endregion WINDOW & NAV
+//#region SERVER
 
 function setCookie(key, value) {
   // lasts up to 24 hours
@@ -142,8 +142,8 @@ function setupSocket() {
   });
 }
 
-// END SERVER
-// GAME CONTENT
+//#endregion SERVER
+//#region GAME CONTENT
 
 function changeGamePage(page) {
   document.querySelector('#game .game-page.shown').classList.remove('shown');
@@ -289,8 +289,8 @@ function drawLandRing(ctx, r, spaces) {
   }
 }
 
-// END GAME CONTENT
-// GAME LOBBY
+//#endregion GAME CONTENT
+//#region GAME LOBBY
 
 function setupLobby() {
   document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
@@ -356,8 +356,8 @@ function getGames() {
   socket.emit('getGames');
 }
 
-// END GAME LOBBY
-// CHAT
+//#endregion GAME LOBBY
+//#region CHAT
 
 function setUsername() {
   const username = (document.getElementById('username-input-text')).value;
@@ -396,7 +396,7 @@ function setupChat() {
   const username = document.getElementById('username-input-text');
   const usernameSend = document.getElementById('username-input-send');
   const chat = document.getElementById('chat-input-text');
-  const chatSend = document.getElementById('username-input-send');
+  const chatSend = document.getElementById('chat-input-send');
 
   // fill saved username
   if(getCookie('username')) username.placeholder = getCookie('username');
@@ -421,4 +421,4 @@ function setupChat() {
   }
 }
 
-// END CHAT
+//#endregion CHAT
