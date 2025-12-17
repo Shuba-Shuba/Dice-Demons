@@ -40,6 +40,11 @@ interface GameLobbyData {
   players: string[]; 
 }
 
+interface CookieData {
+  id: string;
+  username: string;
+}
+
 class Game {
   started: boolean;
   name: string;
@@ -80,7 +85,7 @@ class Player {
   username: string;
   tabs: number;
 
-  constructor(data) {
+  constructor(data: CookieData) {
     this.id = data.id;
     this.username = data.username;
     this.tabs = 1;
@@ -109,7 +114,7 @@ const server = https.createServer(options, app);
 const io = new Server<
   ClientToServerEvents,
   ServerToClientEvents,
-  any,
+  {},
   SocketData
 >();
 const PORT = 443;
@@ -127,7 +132,7 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 // socket.emit -> specific client
 
 const connectedClients: {
-  [key: number]: Player
+  [key: string]: Player
 } = {};
 const games: Game[] = [];
 const words: {
@@ -247,12 +252,12 @@ server.listen(PORT, () => {
 
 // reads cookies and returns object with relevant properties,
 // uses default values when cookie unavailable
-function getCookies(socket: Socket) {
+function getCookies(socket: Socket): CookieData {
   var cookieObj: {
-    id: string | null; 
+    id: string; 
     username: string
   } = {
-    id: null,
+    id: "",
     username: "unnamed"
   };
   if(socket.handshake.headers.cookie && socket.handshake.headers.cookie.length > 0){
@@ -273,8 +278,8 @@ function getCookies(socket: Socket) {
 
 
 // hopefully these never run
-function errorInvalidID(socket, request) {
-  console.error(`Received ${request} request for invalid ID`);
+function errorInvalidID(socket: Socket, event: string): void {
+  console.error(`Received ${event} event for invalid ID`);
   socket.emit('error', {text: "Invalid ID"});
 }
 function errorAlreadyInGame(socket) {
@@ -284,7 +289,7 @@ function errorAlreadyInGame(socket) {
 
 
 // returns random unique game name
-function generateGameName() {
+function generateGameName(): string {
   // get 3 random words: adjective noun verb+ers
   const name = words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + " " + words.things[Math.floor(Math.random()*words.things.length)] + " " + words.doers[Math.floor(Math.random()*words.doers.length)];
   
@@ -302,7 +307,7 @@ function generateGameName() {
 
 
 // looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
-function getPlayer(data) {
+function getPlayer(data: CookieData): Player {
   const id = data.id;
   if(connectedClients[id]) return connectedClients[id];
   for(let i=0; i<games.length; i++){
