@@ -1,20 +1,59 @@
-const express = require('express');
-const https = require('https');
-const fs = require('fs');
-const socketIO = require('socket.io');
-const {parse} = require('cookie');
-const crypto = require('crypto');
-const path = require('path');
+import express, {Request, Response} from 'express';
+import https from 'https';
+import fs from 'fs';
+import {Server, Socket} from 'socket.io';
+import {parse} from 'cookie';
+import crypto from 'crypto';
+import path from 'path';
+
+interface ServerToClientEvents {
+  generateID: (id: string) => void;
+  serverMessage: (msg: Message) => void;
+  chatMessage: (msg: Message) => void;
+  joinedGame: (game: GameLobbyData) => void;
+  getGames: (games: GameLobbyData[]) => void;
+  rollDice: (rolls: number[]) => void;
+}
+
+interface ClientToServerEvents {
+  createGame: () => void;
+  joinGame: (gameName: string) => void;
+  getGames: () => void;
+  createMessage: (msg: Message) => void;
+  setUsername: (username: string) => void;
+  rollDice: () => void;
+}
+
+interface SocketData {
+  player: Player
+}
+
+interface Message {
+  from?: string;
+  text: string;
+  createdAt?: number;
+}
+
+interface GameLobbyData {
+  started: boolean;
+  name: string;
+  players: string[]; 
+}
 
 class Game {
-  constructor(name) {
+  started: boolean;
+  name: string;
+  players: Player[];
+  gameState: Object; // subject to change as implemented
+
+  constructor(name: string) {
     this.started = false;
-    this.name = String(name);
+    this.name = name;
     this.players = [];
     this.gameState = {};
   }
 
-  get lobbyData() {
+  get lobbyData(): GameLobbyData {
     // only include data worth showing on lobby
     return {
       started: this.started,
@@ -23,27 +62,31 @@ class Game {
     }
   }
 
-  removePlayer(id) {
+  removePlayer(id: string) {
     this.players.splice(this.players.findIndex(player => id === player.id),1);
   }
 
-  getPlayer(id) {
+  getPlayer(id: string) {
     return this.players.find(player => player.id === id);
   }
 
-  addPlayer(player) {
+  addPlayer(player: Player) {
     this.players.push(player);
   }
 }
 
 class Player {
+  id: string;
+  username: string;
+  tabs: number;
+
   constructor(data) {
     this.id = data.id;
     this.username = data.username;
     this.tabs = 1;
   }
   
-  isInAGame(games) {
+  isInAGame(games: Game[]) {
     for(let i=0; i<games.length; i++) if(games[i].getPlayer(this. id)) return true;
     return false;
   }
@@ -52,7 +95,7 @@ class Player {
 const domain = 'shubashuba.com';
 const appUnsecured = express();
 // redirect every single incoming http request to https
-appUnsecured.use(function(req, res) {
+appUnsecured.use(function(req: Request, res: Response) {
   res.redirect(301, 'https://' + domain + req.originalUrl);
 });
 appUnsecured.listen(80);
@@ -63,10 +106,13 @@ const options = {
   cert: fs.readFileSync("fullchain.pem"),
 };
 const server = https.createServer(options, app);
-const io = new socketIO.Server(server);
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  any,
+  SocketData
+>();
 const PORT = 443;
-
-const pages = JSON.parse(fs.readFileSync("../frontend/pages.json", "utf-8"));
 
 // frontend
 // home page
@@ -80,9 +126,15 @@ app.get('/socket.io/socket.io.js', (req, res) => {
 // io.emit -> everyone on server
 // socket.emit -> specific client
 
-const connectedClients = {};
-const games = [];
-const words = JSON.parse(fs.readFileSync("words.json", "utf-8"));
+const connectedClients: {
+  [key: number]: Player
+} = {};
+const games: Game[] = [];
+const words: {
+  adjectives: string[];
+  things: string[];
+  doers: string[];
+} = JSON.parse(fs.readFileSync("words.json", "utf-8"));
 
 io.on('connection', (socket) => {
   // connection setup
@@ -139,13 +191,14 @@ io.on('connection', (socket) => {
     games.push(game);
     
     game.addPlayer(socket.data.player);
-    socket.join(gameName);
+    socket.join(game.name);
     socket.emit('joinedGame', game.lobbyData);
   });
   socket.on('joinGame', (gameName) => {
     if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
     
     const game = games.find(game => game.name === gameName);
+    if(game === undefined) return; // note to self: make nonexistant game error handler
 
     game.addPlayer(socket.data.player);
     socket.join(gameName);
@@ -180,35 +233,25 @@ io.on('connection', (socket) => {
 
   // game handlers
   socket.on('rollDice', () => {
-    const rolls = [];
+    const rolls: number[] = [];
     for(let i=0; i<3; i++) rolls.push(Math.floor(Math.random()*6) + 1);
     rolls.sort((a,b) => b-a);
     io.emit('rollDice', rolls);
   });
 });
 
-server.listen(PORT, (error) => {
-  if(!error) console.log(`Server listening on port ${PORT}`);
-  else console.log("Error starting server: ",error);
+server.listen(PORT, () => {
+  console.log('Server listening on port',PORT);
 });
-
-
-// returns random 128-bit stringified int
-function generateID() {
-  var id_nums = crypto.getRandomValues(new Uint32Array(4));
-  var id = "";
-  for(num in id_nums){
-    id += id_nums[num];
-  }
-  //console.log(id);
-  return id;
-}
 
 
 // reads cookies and returns object with relevant properties,
 // uses default values when cookie unavailable
-function getCookies(socket) {
-  var cookieObj = {
+function getCookies(socket: Socket) {
+  var cookieObj: {
+    id: string | null; 
+    username: string
+  } = {
     id: null,
     username: "unnamed"
   };
@@ -217,9 +260,9 @@ function getCookies(socket) {
     if(cookie.id) cookieObj.id = cookie.id
     if(cookie.username) cookieObj.username = cookie.username
   }
-  if(cookieObj.id == null) {
+  if(cookieObj.id === null) {
     // if client doesn't have a cookie, assign a new ID
-    let id = generateID();
+    const id = crypto.randomUUID();
     socket.emit('generateID', id);
     cookieObj.id = id;
   }
