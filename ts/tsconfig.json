@@ -3,5 +3,9 @@
         "rootDir": ".",
         "outDir": "../public/js",
         "lib": ["DOM","ES2015"]
-    }
+    },
+    "files": [
+        "game.ts",
+        "menu.ts"
+    ]
 }
