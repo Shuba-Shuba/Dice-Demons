@@ -1,3 +1,35 @@
+import {io, Socket} from "socket.io-client";
+
+interface ServerToClientEvents {
+  generateID: (id: string) => void;
+  serverMessage: (msg: Message) => void;
+  chatMessage: (msg: Message) => void;
+  joinedGame: (game: GameLobbyData) => void;
+  getGames: (games: GameLobbyData[]) => void;
+  rollDice: (rolls: number[]) => void;
+}
+
+interface ClientToServerEvents {
+  createGame: () => void;
+  joinGame: (gameName: string) => void;
+  getGames: () => void;
+  createMessage: (msg: Message) => void;
+  setUsername: (username: string) => void;
+  rollDice: () => void;
+}
+
+interface Message {
+  from?: string;
+  text: string;
+  createdAt?: number;
+}
+
+interface GameLobbyData {
+  started: boolean;
+  name: string;
+  players: string[]; 
+}
+
 const BOARD_SPAWN_WIDTH = 100;
 const BOARD_LAND_WIDTH = 100;
 const BOARD_BRIDGE_LENGTH = 100;
@@ -19,13 +51,13 @@ setupChat();
 
 // WINDOW
 
-function resize() {
+function resize(): void {
   const a = document.querySelectorAll('canvas.board');
   let boardSize = Math.round(Math.min(document.getElementById('board').getBoundingClientRect().width,document.getElementById('board').getBoundingClientRect().height));
   if(boardSize % 2 === 0) boardSize -= 1;
   const px = boardSize + 'px';
   for(let i=0; i<a.length; i++){
-    const c = a[i];
+    const c = a[i] as HTMLElement;
 
     if(c.style.width === px) return;
     
@@ -37,21 +69,21 @@ function resize() {
 // END WINDOW
 // SERVER
 
-function setCookie(key, value) {
+function setCookie(key: string, value: string): void {
   // lasts up to 24 hours
   document.cookie = `${key}=${value};max-age=86400;path=/`;
 }
 
-function getCookie(key) {
+function getCookie(key: string): string | undefined {
   const a = decodeURIComponent(document.cookie).split('; ');
-  for(const i in a){
+  for(let i=0; i<a.length; i++){
     // str: 'key=value'
     const str = a[i];
     if(str.startsWith(key)) return str.substring(key.length + 1);
   };
 }
 
-function setupSocket() {
+function setupSocket(): void {
   // connections
   socket.on('disconnect', () => {
     receiveMessage('Disconnected from server');
@@ -70,7 +102,7 @@ function setupSocket() {
     console.log('got ID from server:', id);
 
     // quasi-unique default username
-    document.getElementById('username-input-text').value = "unnamed" + (id%1000);
+    (document.getElementById('username-input-text') as HTMLInputElement).value = "unnamed" + (id%1000);
     setUsername();
   });
 
@@ -106,12 +138,12 @@ function setupSocket() {
 // END SERVER
 // GAME CONTENT
 
-function changeGamePage(page) {
+function changeGamePage(page: string): void {
   document.querySelector('#game .game-page.shown').classList.remove('shown');
   document.getElementById(`game-${page}`).classList.add('shown');
 }
 
-function rotate(element, rotation) {
+function rotate(element: HTMLElement, rotation: number) {
   // get old rotation
   const oldRotation = element.style.rotate;
   
@@ -135,24 +167,24 @@ function rotate(element, rotation) {
   element.style.rotate = newRotation;
 }
 
-function rollDice() {
+function rollDice(): void {
   // server-side
   socket.emit('rollDice');
 }
 
-function setupGame() {
+function setupGame(): void {
   setupBoard();
   addEventListener('resize', resize);
   document.getElementById('dice-container').addEventListener('click', rollDice);
 }
 
-function setupBoard() {
+function setupBoard(): void {
   // create spawn ring
   const spawn = document.createElement('canvas');
   spawn.classList.add('board');
   spawn.id = 'spawn';
   spawn.style.rotate = '0deg';
-  spawn.style.zIndex = 99;
+  spawn.style.zIndex = '99';
   spawn.width = BOARD_PIXEL_RADIUS*2;
   spawn.height = BOARD_PIXEL_RADIUS*2;
   drawLandRing(spawn.getContext('2d'), BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
@@ -166,7 +198,7 @@ function setupBoard() {
     bridgeCanvas.classList.add('board');
     bridgeCanvas.id = `bridge${i}`;
     bridgeCanvas.style.rotate = '0deg';
-    bridgeCanvas.style.zIndex = 100 - 2*i;
+    bridgeCanvas.style.zIndex = `${100 - 2*i}`;
     bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
     bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
     drawBridgeRing(
@@ -180,7 +212,7 @@ function setupBoard() {
     landCanvas.classList.add('board');
     landCanvas.id = `land${i}`;
     landCanvas.style.rotate = '0deg';
-    landCanvas.style.zIndex = 99 - 2*i;
+    landCanvas.style.zIndex = `${99 - 2*i}`;
     landCanvas.width = BOARD_PIXEL_RADIUS*2;
     landCanvas.height = BOARD_PIXEL_RADIUS*2;
     drawLandRing(
@@ -192,7 +224,7 @@ function setupBoard() {
   }
 }
 
-function drawBridgeRing(ctx, r, spaces) {
+function drawBridgeRing(ctx: CanvasRenderingContext2D, r: number, spaces: number): void {
   const bridges = spaces/BOARD_SPACES_PER_BRIDGE;
   
   ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
@@ -223,7 +255,7 @@ function drawBridgeRing(ctx, r, spaces) {
   }
 }
 
-function drawLandRing(ctx, r, spaces) {
+function drawLandRing(ctx: CanvasRenderingContext2D, r: number, spaces: number): void {
   let landWidth = BOARD_LAND_WIDTH;
   if(r === BOARD_SPAWN_WIDTH) landWidth = r;
 
@@ -253,13 +285,13 @@ function drawLandRing(ctx, r, spaces) {
 // END GAME CONTENT
 // GAME LOBBY
 
-function setupLobby() {
+function setupLobby(): void {
   document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
   document.getElementById('lobby-buttons').children[1].addEventListener('click', getGames);
   getGames();
 }
 
-function showGame(game) {
+function showGame(game: GameLobbyData): void {
   const room = document.createElement('article');
   room.classList.add('lobby-room');
 
@@ -297,11 +329,11 @@ function showGame(game) {
   document.getElementById('lobby-rooms').appendChild(room);
 }
 
-function createGame() {
+function createGame(): void {
   socket.emit('createGame');
 }
 
-function joinedGame(game) {
+function joinedGame(game: GameLobbyData): void {
   changeGamePage('room');
   document.querySelector('#game-room h1').textContent = game.name;
   const roomPlayers = document.getElementById('room-players');
@@ -312,7 +344,7 @@ function joinedGame(game) {
   }
 }
 
-function getGames() {
+function getGames(): void {
   document.getElementById('lobby-rooms').innerHTML = 'loading...';
   socket.emit('getGames');
 }
@@ -320,25 +352,23 @@ function getGames() {
 // END GAME LOBBY
 // CHAT
 
-function setUsername() {
-  const username = document.getElementById('username-input-text').value;
-  document.getElementById('username-input-text').placeholder = username;
-  document.getElementById('username-input-text').value = "";
+function setUsername(): void {
+  const username = (document.getElementById('username-input-text') as HTMLInputElement).value;
   receiveMessage(`Set username to ${username}`);
   setCookie('username', username);
   socket.emit('setUsername', username);
 }
 
-function sendMessage() {
-  const msg = document.getElementById("chat-input-text").value;
-  document.getElementById("chat-input-text").value = "";
+function sendMessage(): void {
+  const msg = document.getElementById("chat-input-text") as HTMLInputElement;
   socket.emit('createMessage', {
-    text: msg,
+    text: msg.value,
     createdAt: Date.now()
   });
+  msg.value = "";
 }
 
-function receiveMessage(txt) {
+function receiveMessage(txt: string): void {
   showMessage(txt);
 
   // save message
@@ -348,27 +378,32 @@ function receiveMessage(txt) {
   sessionStorage.setItem('chatLog', JSON.stringify(chatLog));
 }
 
-function showMessage(txt) {
+function showMessage(txt: string): void {
   var p = document.createElement('p');
   p.textContent = txt;
   document.getElementById('chat-messages').appendChild(p);
   p.scrollIntoView();
 }
 
-function setupChat() {
+function setupChat(): void {
+  const username = document.getElementById('username-input-text') as HTMLInputElement;
+  const usernameSend = document.getElementById('username-input-send') as HTMLButtonElement;
+  const chat = document.getElementById('chat-input-text') as HTMLInputElement;
+  const chatSend = document.getElementById('username-input-send') as HTMLButtonElement;
+
   // fill saved username
-  if(getCookie('username')) document.getElementById('username-input-text').placeholder = getCookie('username');
-  else document.getElementById('username-input-text').placeholder = "unnamed";
+  if(getCookie('username')) username.placeholder = getCookie('username');
+  else username.placeholder = "unnamed";
 
   // submit buttons
-  document.getElementById('username-input-send').addEventListener('click', setUsername);
-  document.getElementById('chat-input-send').addEventListener('click', sendMessage);
+  usernameSend.addEventListener('click', setUsername);
+  chatSend.addEventListener('click', sendMessage);
 
   // enter key submits chat input
-  document.getElementById('username-input-text').addEventListener('keydown', ({key}) => {
+  username.addEventListener('keydown', ({key}) => {
     if(key === 'Enter') setUsername();
   });
-  document.getElementById('chat-input-text').addEventListener('keydown', ({key}) => {
+  chat.addEventListener('keydown', ({key}) => {
     if(key === 'Enter') sendMessage();
   });
 
