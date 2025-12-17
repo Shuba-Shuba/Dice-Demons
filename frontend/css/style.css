@@ -77,7 +77,7 @@ html, body {
   display: none;
 }
 
-#game-lobby.shown {
+#game-lobby.shown, #game-room.shown {
   display: flex;
   flex-flow: column;
   height: 100%;
@@ -86,19 +86,19 @@ html, body {
   align-items: center;
 }
 
-#game-lobby h1 {
+.game-page h1 {
   margin: 0;
   text-align: center;
 }
 
-#lobby-buttons {
+#lobby-buttons, #room-controls {
   width: 100%;
   display: flex;
   flex-flow: row;
   gap: 1em;
 }
 
-#lobby-buttons button {
+#lobby-buttons button, #room-controls button {
   flex: 1 1 auto;
   padding: 2em;
 }
@@ -137,7 +137,7 @@ html, body {
   column-gap: 1em;
 }
 
-.lobby-room p,h2 {
+.lobby-room p, .lobby-room h2, #game-room p {
   margin: 0;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -150,6 +150,17 @@ html, body {
   flex-flow: column;
   text-align: center;
   justify-content: center;
+}
+
+#room-players {
+  width: 100%;
+  flex: 1;
+  border: 1px solid black;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  flex-flow: column wrap;
+  column-gap: 1em;
 }
 
 #game-content.shown {

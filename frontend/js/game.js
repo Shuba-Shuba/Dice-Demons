@@ -67,7 +67,7 @@ function setupSocket() {
   // ID
   socket.on('generateID', (id) => {
     setCookie('id', id);
-    console.log('got ID from server: ', id);
+    console.log('got ID from server:', id);
 
     // quasi-unique default username
     document.getElementById('username-input-text').value = "unnamed" + (id%1000);
@@ -83,6 +83,7 @@ function setupSocket() {
       showGame(games[i]);
     }
   });
+  socket.on('joinedGame', (game) => joinedGame(game));
 
   // chat
   socket.on('chatMessage', (msg) => {
@@ -104,6 +105,11 @@ function setupSocket() {
 
 // END SERVER
 // GAME CONTENT
+
+function changeGamePage(page) {
+  document.querySelector('#game .game-page.shown').classList.remove('shown');
+  document.getElementById(`game-${page}`).classList.add('shown');
+}
 
 function rotate(element, rotation) {
   // get old rotation
@@ -256,12 +262,16 @@ function setupLobby() {
 function showGame(game) {
   const room = document.createElement('article');
   room.classList.add('lobby-room');
-  
+
   const roomInfo = document.createElement('div');
   roomInfo.classList.add('lobby-room-info');
   const roomName = document.createElement('h2');
   roomName.textContent = game.name;
   roomInfo.appendChild(roomName);
+  const roomStarted = document.createElement('p');
+  if(game.started) roomStarted.textContent = 'Game in progress';
+  else roomStarted.textContent = 'In lobby';
+  roomInfo.appendChild(roomStarted);
   const roomPlayerCount = document.createElement('p');
   roomPlayerCount.textContent = `${game.players.length} players`;
   roomInfo.appendChild(roomPlayerCount);
@@ -289,7 +299,17 @@ function showGame(game) {
 
 function createGame() {
   socket.emit('createGame');
-  getGames();
+}
+
+function joinedGame(game) {
+  changeGamePage('room');
+  document.querySelector('#game-room h1').textContent = game.name;
+  const roomPlayers = document.getElementById('room-players');
+  for(let i=0; i<game.players.length; i++){
+    const roomPlayer = document.createElement('p');
+    roomPlayer.textContent = game.players[i];
+    roomPlayers.appendChild(roomPlayer);
+  }
 }
 
 function getGames() {

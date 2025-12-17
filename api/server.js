@@ -137,16 +137,19 @@ io.on('connection', (socket) => {
     const game = new Game(generateGameName());
     socket.emit('serverMessage', {text: `Created game "${game.name}"`});
     games.push(game);
+    
     game.addPlayer(socket.data.player);
-    // console.log(game);
+    socket.join(gameName);
+    socket.emit('joinedGame', game.lobbyData);
   });
   socket.on('joinGame', (gameName) => {
     if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
-
+    
     const game = games.find(game => game.name === gameName);
+
     game.addPlayer(socket.data.player);
     socket.join(gameName);
-    socket.emit('joinedGame', gameName);
+    socket.emit('joinedGame', game.lobbyData);
   });
   socket.on('getGames', () => {
     socket.emit('getGames', games.map(game => game.lobbyData));
