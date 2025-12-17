@@ -260,7 +260,7 @@ function getCookies(socket: Socket): CookieData {
     if(cookie.id) cookieObj.id = cookie.id
     if(cookie.username) cookieObj.username = cookie.username
   }
-  if(cookieObj.id === null) {
+  if(cookieObj.id === "") {
     // if client doesn't have a cookie, assign a new ID
     const id = crypto.randomUUID();
     socket.emit('generateID', id);

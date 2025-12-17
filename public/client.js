@@ -108,8 +108,8 @@ function setupSocket() {
     setCookie('id', id);
     console.log('got ID from server:', id);
 
-    // quasi-unique default username
-    (document.getElementById('username-input-text')).value = "unnamed" + (id%1000);
+    // default username
+    (document.getElementById('username-input-text')).value = "unnamed" + Math.floor(Math.random()*1000);
     setUsername();
   });
 
