@@ -10,7 +10,6 @@ interface ServerToClientEvents {
   generateID: (id: string) => void;
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
-  joinedGame: (game: GameLobbyData) => void;
   rollDice: (rolls: number[]) => void;
 }
 
