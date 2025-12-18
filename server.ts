@@ -220,17 +220,18 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUsername', (username, callback) => {
-    if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'setUsername');
-
-    console.log(connectedClients);
-    socket.data.player.username = username;
-    console.log(connectedClients);
+    if(!connectedClients[socket.data.player.id]){
+      callback({success: false, reason: 'Invalid user ID'});
+      return errorInvalidID(socket, 'setUsername');
+    }
 
     callback({success: true});
     socket.broadcast.emit('serverMessage', {
       text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });
+    
+    socket.data.player.username = username;
   });
 
   // game handlers

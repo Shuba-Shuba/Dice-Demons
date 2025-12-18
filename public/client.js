@@ -361,12 +361,12 @@ function getGames() {
 
 async function setUsername(username) {
   try {
-    const {success} = await socket.timeout(1000).emitWithAck('setUsername', username);
-    if(success){
+    const response = await socket.timeout(1000).emitWithAck('setUsername', username);
+    if(response.success){
       receiveMessage(`Set username to ${username}`);
       setCookie('username', username);
     } else {
-      const errorMsg = 'Failed to set username';
+      const errorMsg = `Failed to set username: ${response.reason}`;
       console.error(errorMsg);
       alert(errorMsg);
     }
