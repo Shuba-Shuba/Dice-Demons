@@ -65,15 +65,15 @@ class Game {
     }
   }
 
-  removePlayer(id: string) {
+  removePlayer(id: string): void {
     this.players.splice(this.players.findIndex(player => id === player.id),1);
   }
 
-  getPlayer(id: string) {
+  getPlayer(id: string): Player | undefined {
     return this.players.find(player => player.id === id);
   }
 
-  addPlayer(player: Player) {
+  addPlayer(player: Player): void {
     this.players.push(player);
   }
 }
@@ -89,9 +89,9 @@ class Player {
     this.tabs = 1;
   }
   
-  isInAGame(games: Game[]) {
-    for(let i=0; i<games.length; i++) if(games[i].getPlayer(this. id)) return true;
-    return false;
+  get currentGame(): Game | undefined {
+    for(let i=0; i<games.length; i++) if(games[i].getPlayer(this.id)) return games[i];
+    return undefined;
   }
 }
 
@@ -146,11 +146,20 @@ io.on('connection', (socket) => {
   if(!connectedClients[player.id]){
     // first tab
     connectedClients[player.id] = player;
-    player.tabs = 1;
-    socket.broadcast.emit('serverMessage', {
-      text: `${player.username} joined`,
-      createdAt: Date.now()
-    });
+    if(player.currentGame){
+      // reconnected
+      player.tabs = 1;
+      socket.broadcast.emit('serverMessage', {
+        text: `${player.username} reconnected`,
+        createdAt: Date.now()
+      });
+    } else {
+      // first join
+      socket.broadcast.emit('serverMessage', {
+        text: `${player.username} joined`,
+        createdAt: Date.now()
+      });
+    }
   } else {
     // extra tab
     socket.broadcast.emit('serverMessage', {
@@ -182,7 +191,7 @@ io.on('connection', (socket) => {
 
   // lobby handlers
   socket.on('createGame', (callback) => {
-    if(socket.data.player.isInAGame(games)){
+    if(socket.data.player.currentGame){
       callback({success: false, reason: "You're already in a game!"});
       return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to create a game while already in a game`);
     }
@@ -195,7 +204,7 @@ io.on('connection', (socket) => {
     callback({success: true, game: game.lobbyData});
   });
   socket.on('joinGame', (gameName, callback) => {
-    if(socket.data.player.isInAGame(games)){
+    if(socket.data.player.currentGame){
       callback({success: false, reason: "You're already in a game!"});
       return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to join a game while already in a game`);
     }
@@ -310,7 +319,7 @@ function getPlayer(data: CookieData): Player {
   for(let i=0; i<games.length; i++){
     const p = games[i].getPlayer(id);
     if(p){
-      console.log(`found player in ${games[i].name}`);
+      console.log('found player in',games[i].name,'Tabs:',p.tabs);
       return p;
     }
   }
