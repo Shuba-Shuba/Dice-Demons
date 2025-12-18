@@ -19,7 +19,7 @@ interface ClientToServerEvents {
   createGame: () => void;
   joinGame: (gameName: string) => void;
   getGames: () => void;
-  createMessage: (msg: Message) => void;
+  chatMessage: (msg: Message) => void;
   setUsername: (username: string, callback: Function) => void;
   rollDice: () => void;
 }
@@ -209,9 +209,9 @@ io.on('connection', (socket) => {
   });
   
   // chat handlers
-  socket.on('createMessage', (message) => {
+  socket.on('chatMessage', (message) => {
     if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'createMessage');
-    
+
     io.emit('chatMessage', {
       from: socket.data.player.username,
       text: message.text,

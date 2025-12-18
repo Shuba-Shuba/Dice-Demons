@@ -379,7 +379,7 @@ async function setUsername(username) {
 
 function sendChatMessage() {
   const msg = document.getElementById('chat-input-message');
-  socket.emit('createMessage', {
+  socket.emit('chatMessage', {
     text: msg.value,
     createdAt: Date.now()
   });
