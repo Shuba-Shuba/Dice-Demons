@@ -138,13 +138,11 @@
       </section>
       <section class="page" id="chat">
         <div id="chat-messages"></div>
-        <div class="chat-input">
-          <input type="text" id="username-input-text" placeholder="unnamed">
-          <button id="username-input-send">Set Username</button>
-        </div>
-        <div class="chat-input">
-          <input type="text" id="chat-input-text" placeholder="Say something...">
-          <button id="chat-input-send">Send Message</button>
+        <div id="chat-input">
+          <label for="chat-input-username">
+            <<input type="text" id="chat-input-username" placeholder="Username" size="12" maxlength="20">>
+          </label>
+          <input type="text" id="chat-input-message" placeholder="Say something...">
         </div>
       </section>
     </div>

@@ -20,7 +20,7 @@ interface ClientToServerEvents {
   joinGame: (gameName: string) => void;
   getGames: () => void;
   createMessage: (msg: Message) => void;
-  setUsername: (username: string) => void;
+  setUsername: (username: string, callback: Function) => void;
   rollDice: () => void;
 }
 
@@ -219,16 +219,18 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('setUsername', (username) => {
+  socket.on('setUsername', (username, callback) => {
     if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'setUsername');
-    
+
+    console.log(connectedClients);
+    socket.data.player.username = username;
+    console.log(connectedClients);
+
+    callback({success: true});
     socket.broadcast.emit('serverMessage', {
       text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });
-    connectedClients[socket.data.player.id].username = username;
-    socket.data.player.username = username;
-    // console.log(connectedClients);
   });
 
   // game handlers

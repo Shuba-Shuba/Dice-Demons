@@ -29,7 +29,7 @@ function setupMenu() {
         // create menu button
         var button = document.createElement('button');
         button.textContent = pages[page].title;
-        button.id = pages[page].id + "-menubutton";
+        button.id = pages[page].id + '-menubutton';
         button.addEventListener('click', changePage);
         button.addEventListener('click', resize);
         document.getElementById('menu').appendChild(button);
@@ -100,7 +100,7 @@ function setupSocket() {
   });
   socket.on('error', ({text}) => {
     console.error('Server sent error:', text);
-    alert("ERROR: " + text);
+    alert('ERROR: ' + text);
   });
 
   // ID
@@ -109,7 +109,7 @@ function setupSocket() {
     console.log('got ID from server:', id);
 
     // default username
-    (document.getElementById('username-input-text')).value = "unnamed" + Math.floor(Math.random()*1000);
+    (document.getElementById('chat-input-username')).value = 'unnamed' + Math.floor(Math.random()*1000);
     setUsername();
   });
 
@@ -155,7 +155,7 @@ function rotate(element, rotation) {
   const oldRotation = element.style.rotate;
   
   // calculate new rotation
-  const newRotation = String(parseFloat(oldRotation.substring(0,oldRotation.length-3))+rotation) + "deg";
+  const newRotation = String(parseFloat(oldRotation.substring(0,oldRotation.length-3))+rotation) + 'deg';
   
   // animate to new rotation
   // animations auto-removed so no memory leak
@@ -359,20 +359,31 @@ function getGames() {
 //#endregion GAME LOBBY
 //#region CHAT
 
-function setUsername() {
-  const username = (document.getElementById('username-input-text')).value;
-  receiveMessage(`Set username to ${username}`);
-  setCookie('username', username);
-  socket.emit('setUsername', username);
+async function setUsername(username) {
+  try {
+    const {success} = await socket.timeout(1000).emitWithAck('setUsername', username);
+    if(success){
+      receiveMessage(`Set username to ${username}`);
+      setCookie('username', username);
+    } else {
+      const errorMsg = 'Failed to set username';
+      console.error(errorMsg);
+      alert(errorMsg);
+    }
+  } catch (e) {
+    const errorMsg = 'Server did not respond in time to set username request';
+    console.error(errorMsg);
+    showMessage(errorMsg);
+  }
 }
 
-function sendMessage() {
-  const msg = document.getElementById("chat-input-text");
+function sendChatMessage() {
+  const msg = document.getElementById('chat-input-message');
   socket.emit('createMessage', {
     text: msg.value,
     createdAt: Date.now()
   });
-  msg.value = "";
+  msg.value = '';
 }
 
 function receiveMessage(txt) {
@@ -393,25 +404,24 @@ function showMessage(txt) {
 }
 
 function setupChat() {
-  const username = document.getElementById('username-input-text');
-  const usernameSend = document.getElementById('username-input-send');
-  const chat = document.getElementById('chat-input-text');
-  const chatSend = document.getElementById('chat-input-send');
+  const username = document.getElementById('chat-input-username');
+  const chat = document.getElementById('chat-input-message');
 
   // fill saved username
-  if(getCookie('username')) username.placeholder = getCookie('username');
-  else username.placeholder = "unnamed";
+  if(getCookie('username')) username.value = getCookie('username');
+  else username.value = 'unnamed';
 
-  // submit buttons
-  usernameSend.addEventListener('click', setUsername);
-  chatSend.addEventListener('click', sendMessage);
-
-  // enter key submits chat input
-  username.addEventListener('keydown', ({key}) => {
-    if(key === 'Enter') setUsername();
+  // enter key submits text input
+  username.addEventListener('keydown', ({target, key}) => {
+    if(key === 'Enter') setUsername(target.value);
   });
   chat.addEventListener('keydown', ({key}) => {
-    if(key === 'Enter') sendMessage();
+    if(key === 'Enter') sendChatMessage();
+  });
+
+  // deselecting username input submits if changed
+  username.addEventListener('blur', ({target}) => {
+    if(target.value !== getCookie('username')) setUsername(target.value);
   });
 
   // load chat history from session storage

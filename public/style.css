@@ -53,11 +53,50 @@ html, body {
   display: flex;
   flex-flow: column;
   height: 100%;
-  gap: var(--page-margin);
 }
 
-#chat .chat-input {
+#chat-input {
   flex: 0 1 auto;
+  border: 1px solid black;
+  display: flex;
+}
+
+#chat-input input {
+  border: none;
+  font-size: medium;
+}
+
+@container content (450px <= width < 600px) {
+  #chat-input input {
+    font-size: .8em;
+  }
+}
+
+@container content (350px <= width < 450px) {
+  #chat-input input {
+    font-size: .6em;
+  }
+}
+
+@container content (width < 350px) {
+  #chat-input input {
+    font-size: .5em;
+  }
+}
+
+#chat-input label {
+  font-size: large;
+  padding-left: 1em;
+}
+
+#chat-input-username {
+  flex: 0;
+  padding: 1em .5em;
+}
+
+#chat-input-message {
+  flex: 1;
+  padding: 1em;
 }
 
 #chat-messages {
@@ -67,6 +106,7 @@ html, body {
   scroll-behavior: smooth;
   padding: 0 var(--page-margin);
   border: 1px solid black;
+  border-bottom: 0;
 }
 
 #game.selected {
