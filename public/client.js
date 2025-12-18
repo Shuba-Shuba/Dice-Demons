@@ -98,12 +98,12 @@ function setupSocket() {
   socket.on('connect', () => {
     receiveMessage('Connected to server');
   });
-  socket.on('error', ({text}) => {
-    console.error('Server sent error:', text);
-    alert('ERROR: ' + text);
-  });
 
   // ID
+  socket.on('invalidID', (event) => {
+    console.error('Invalid ID error for', event);
+    alert('Invalid ID error for ' + event);
+  });
   socket.on('generateID', (id) => {
     setCookie('id', id);
     console.log('got ID from server:', id);
@@ -112,17 +112,6 @@ function setupSocket() {
     (document.getElementById('chat-input-username')).value = 'unnamed' + Math.floor(Math.random()*1000);
     setUsername();
   });
-
-  // lobby
-  socket.on('getGames', (games) => {
-    if(games.length === 0) return document.getElementById('lobby-rooms').innerHTML = 'No games found on server :('
-
-    document.getElementById('lobby-rooms').innerHTML = '';
-    for(let i=0; i<games.length; i++){
-      showGame(games[i]);
-    }
-  });
-  socket.on('joinedGame', (game) => joinedGame(game));
 
   // chat
   socket.on('chatMessage', (msg) => {
@@ -327,17 +316,49 @@ function showGame(game) {
 
   const roomJoinButton = document.createElement('button');
   roomJoinButton.textContent = 'Join Game';
-  roomJoinButton.addEventListener('click', (function({target}){
-    socket.emit('joinGame', this.name);
-    target.textContent = 'Joining...';
-  }).bind(game));
+  roomJoinButton.addEventListener('click', joinGame.bind(game));
   room.appendChild(roomJoinButton);
 
   document.getElementById('lobby-rooms').appendChild(room);
 }
 
-function createGame() {
-  socket.emit('createGame');
+async function joinGame({target}) {
+  // this = game lobby data
+  target.textContent = 'Joining...';
+  try {
+    const response = await socket.timeout(1000).emitWithAck('joinGame', this.name);
+    if(response.success){
+      joinedGame(response.game);
+    } else {
+      target.textContent = 'Join Game';
+      console.error('Error joining game:', response.reason);
+      alert('Error joining game: ' + response.reason);
+    }
+  } catch (e) {
+    target.textContent = 'Join Game';
+    const errorMsg = 'Server did not respond in time to create game request';
+    console.error(errorMsg);
+    alert(errorMsg);
+  }
+}
+
+async function createGame({target}) {
+  target.textContent = 'Creating...';
+  try {
+    const response = await socket.timeout(1000).emitWithAck('createGame');
+    if(response.success){
+      joinedGame(response.game);
+    } else {
+      target.textContent = 'Create Game';
+      console.error('Error creating game:', response.reason);
+      alert('Error creating game: ' + response.reason);
+    }
+  } catch (e) {
+    target.textContent = 'Create Game';
+    const errorMsg = 'Server did not respond in time to create game request';
+    console.error(errorMsg);
+    alert(errorMsg);
+  }
 }
 
 function joinedGame(game) {
@@ -351,9 +372,23 @@ function joinedGame(game) {
   }
 }
 
-function getGames() {
-  document.getElementById('lobby-rooms').innerHTML = 'loading...';
-  socket.emit('getGames');
+async function getGames() {
+  const lobby = document.getElementById('lobby-rooms');
+  lobby.innerHTML = 'loading...';
+  try {
+    const games = await socket.timeout(1000).emitWithAck('getGames');
+    
+    if(games.length === 0) return lobby.innerHTML = 'No games found on server :('
+
+    lobby.innerHTML = '';
+    for(let i=0; i<games.length; i++){
+      showGame(games[i]);
+    }
+  } catch (e) {
+    const errorMsg = 'Server did not respond in time to get game list request';
+    console.error(errorMsg);
+    lobby.innerHTML = errorMsg;
+  }
 }
 
 //#endregion GAME LOBBY
@@ -365,6 +400,7 @@ async function setUsername(username) {
     if(response.success){
       receiveMessage(`Set username to ${username}`);
       setCookie('username', username);
+      document.getElementById('chat-input-username').value = username;
     } else {
       const errorMsg = `Failed to set username: ${response.reason}`;
       console.error(errorMsg);

@@ -11,16 +11,15 @@ interface ServerToClientEvents {
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
   joinedGame: (game: GameLobbyData) => void;
-  getGames: (games: GameLobbyData[]) => void;
   rollDice: (rolls: number[]) => void;
 }
 
 interface ClientToServerEvents {
-  createGame: () => void;
-  joinGame: (gameName: string) => void;
-  getGames: () => void;
+  createGame: (callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
+  joinGame: (gameName: string, callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
+  getGames: (callback: (games: GameLobbyData[]) => void) => void;
   chatMessage: (msg: Message) => void;
-  setUsername: (username: string, callback: Function) => void;
+  setUsername: (username: string, callback: (response: {success: boolean, reason?: string}) => void) => void;
   rollDice: () => void;
 }
 
@@ -183,29 +182,34 @@ io.on('connection', (socket) => {
   });
 
   // lobby handlers
-  socket.on('createGame', () => {
-    if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
+  socket.on('createGame', (callback) => {
+    if(socket.data.player.isInAGame(games)){
+      callback({success: false, reason: "You're already in a game!"});
+      return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to create a game while already in a game`);
+    }
 
     const game = new Game(generateGameName());
-    socket.emit('serverMessage', {text: `Created game "${game.name}"`});
     games.push(game);
-    
+
     game.addPlayer(socket.data.player);
     socket.join(game.name);
-    socket.emit('joinedGame', game.lobbyData);
+    callback({success: true, game: game.lobbyData});
   });
-  socket.on('joinGame', (gameName) => {
-    if(socket.data.player.isInAGame(games)) return errorAlreadyInGame(socket);
+  socket.on('joinGame', (gameName, callback) => {
+    if(socket.data.player.isInAGame(games)){
+      callback({success: false, reason: "You're already in a game!"});
+      return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to join a game while already in a game`);
+    }
     
     const game = games.find(game => game.name === gameName);
     if(game === undefined) return; // note to self: make nonexistant game error handler
 
     game.addPlayer(socket.data.player);
     socket.join(gameName);
-    socket.emit('joinedGame', game.lobbyData);
+    callback({success: true, game: game.lobbyData});
   });
-  socket.on('getGames', () => {
-    socket.emit('getGames', games.map(game => game.lobbyData));
+  socket.on('getGames', (callback) => {
+    callback(games.map(game => game.lobbyData));
   });
   
   // chat handlers
@@ -230,7 +234,7 @@ io.on('connection', (socket) => {
       text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
       createdAt: Date.now()
     });
-    
+
     socket.data.player.username = username;
   });
 
@@ -278,11 +282,7 @@ function getCookies(socket: Socket): CookieData {
 // hopefully these never run
 function errorInvalidID(socket: Socket, event: string): void {
   console.error(`Received ${event} event for invalid ID`);
-  socket.emit('error', {text: "Invalid ID"});
-}
-function errorAlreadyInGame(socket) {
-  console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to join/create a game while already in a game`);
-  socket.emit('error', {text: "Cannot join or create a game while already in a game"});
+  socket.emit('invalidID', event);
 }
 
 
