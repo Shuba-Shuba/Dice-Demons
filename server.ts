@@ -138,7 +138,7 @@ app.use(express.static(path.join(__dirname,'public')));
 // socket.emit -> specific client
 
 const connectedClients: {
-  [key: string]: Player
+  [id: string]: Player
 } = {};
 const games: Game[] = [];
 const words: {
@@ -150,54 +150,49 @@ const words: {
 io.on('connection', (socket) => {
   //#region connection setup
   const data = getCookies(socket);
-  const player = getPlayer(data);
+  const {player, status} = getPlayer(data);
   // if they edit their cookie while offline, use their data
   player.username = data.username;
 
   socket.data.player = player;
 
-  if(!connectedClients[player.id]){
-    // first tab
-    connectedClients[player.id] = player;
-    if(player.currentGame){
-      // reconnected
+  switch(status){
+    case 'extra tab':
+      socket.broadcast.emit('serverMessage', {
+        text: `${player.username} opened an extra tab`,
+        createdAt: Date.now()
+      });
+      player.tabs += 1;
+      break;
+    case 'reconnect':
+      connectedClients[player.id] = player;
       player.tabs = 1;
       socket.broadcast.emit('serverMessage', {
         text: `${player.username} reconnected`,
         createdAt: Date.now()
       });
-    } else {
-      // first join
+      break;
+    default:
+      connectedClients[player.id] = player;
       socket.broadcast.emit('serverMessage', {
         text: `${player.username} joined`,
         createdAt: Date.now()
       });
-    }
-  } else {
-    // extra tab
-    socket.broadcast.emit('serverMessage', {
-      text: `${player.username} opened an extra tab`,
-      createdAt: Date.now()
-    });
-    connectedClients[player.id].tabs += 1;
   }
-  // console.log(connectedClients);
 
   socket.on('disconnect', () => {
-    connectedClients[socket.data.player.id].tabs -= 1;
-    if(connectedClients[socket.data.player.id].tabs === 0){
+    socket.data.player.tabs -= 1;
+    if(socket.data.player.tabs === 0){
       socket.broadcast.emit('serverMessage', {
         text: `${player.username} disconnected`,
         createdAt: Date.now()
       });
       delete connectedClients[socket.data.player.id];
-      // console.log(connectedClients);
     } else {
       socket.broadcast.emit('serverMessage', {
         text: `${socket.data.player.username} closed an extra tab`,
         createdAt: Date.now()
       });
-      // console.log(connectedClients);
     }
   });
   //#endregion
@@ -253,7 +248,7 @@ io.on('connection', (socket) => {
 
     callback({success: true});
     socket.broadcast.emit('serverMessage', {
-      text: `${connectedClients[socket.data.player.id].username} changed their username to ${username}`,
+      text: `${socket.data.player.username} changed their username to ${username}`,
       createdAt: Date.now()
     });
 
@@ -332,17 +327,19 @@ function generateGameName(): string {
 
 
 // looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
-function getPlayer(data: CookieData): Player {
+function getPlayer(data: CookieData): {player: Player, status: string} {
   const id = data.id;
-  if(connectedClients[id]) return connectedClients[id];
+
+  // already connected (extra tab)
+  if(connectedClients[id]) return {player: connectedClients[id], status: 'extra tab'};
+
+  // reconnecting to game
   for(let i=0; i<games.length; i++){
     const p = games[i].getPlayer(id);
-    if(p){
-      console.log('found player in',games[i].name,'Tabs:',p.tabs);
-      return p;
-    }
+    if(p) return {player: p, status: 'reconnect'};
   }
-  console.log("didn't find existing player object");
-  return new Player(data);
+
+  // not in game
+  return {player: new Player(data), status: 'normal'};
 }
 //#endregion
