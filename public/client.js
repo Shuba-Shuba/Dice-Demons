@@ -325,7 +325,7 @@ function showGame(game) {
   document.getElementById('lobby-rooms').appendChild(room);
 
   // join game automatically if name matches hash
-  if(game.name === location.hash.substring(1).replaceAll('-',' ')) roomJoinButton.click();
+  if(game.name.replaceAll(' ','') === location.hash.substring(1)) roomJoinButton.click();
 }
 
 async function joinGame({target}) {
@@ -372,7 +372,7 @@ async function createGame({target}) {
 function joinedGame(game) {
   changeGamePage('room');
   document.querySelector('#game-room h1').textContent = game.name;
-  location.hash = game.name.replaceAll(' ','-');
+  location.hash = game.name.replaceAll(' ','');
   const roomPlayers = document.getElementById('room-players');
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
