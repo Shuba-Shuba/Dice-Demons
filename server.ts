@@ -9,7 +9,7 @@ import path from 'path';
 interface ServerToClientEvents {
   // server
   generateID: (id: string, username: string) => void;
-  
+
   // chat
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
@@ -23,11 +23,12 @@ interface ClientToServerEvents {
   createGame: (callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   joinGame: (gameName: string, callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
-  
+  leaveGame: (callback: (response: {success: boolean, reason?: string}) => void) => void;
+
   // chat
   chatMessage: (msg: Message) => void;
   setUsername: (username: string, callback: (response: {success: boolean, reason?: string}) => void) => void;
-  
+
   // game
   rollDice: () => void;
 }
@@ -78,7 +79,12 @@ class Game {
   }
 
   removePlayer(id: string): void {
-    this.players.splice(this.players.findIndex(player => id === player.id),1);
+    const i = this.players.findIndex(player => id === player.id);
+    if(i===-1) return;
+    this.players[i].currentGame = undefined;
+    this.players.splice(i,1);
+
+    // this method should call a function to destroy this game if there's no players now
   }
 
   getPlayer(id: string): Player | undefined {
@@ -198,30 +204,51 @@ io.on('connection', (socket) => {
 
   //#region lobby handlers
   socket.on('createGame', (callback) => {
-    if(socket.data.player.currentGame){
+    const player = socket.data.player;
+    if(player.currentGame){
       callback({success: false, reason: "You're already in a game!"});
-      return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to create a game while already in a game`);
+      return console.error(`Player "${player.username}" (ID ${player.id}) tried to create a game while already in a game`);
     }
 
     const game = new Game(generateGameName());
     games.push(game);
 
-    game.addPlayer(socket.data.player);
+    game.addPlayer(player);
     socket.join(game.name);
     callback({success: true, game: game.lobbyData});
   });
   socket.on('joinGame', (gameName, callback) => {
-    if(socket.data.player.currentGame){
+    const player = socket.data.player;
+    if(player.currentGame){
       callback({success: false, reason: "You're already in a game!"});
-      return console.error(`Player "${socket.data.player.username}" (ID ${socket.data.player.id}) tried to join a game while already in a game`);
+      return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game while already in a game`);
     }
     
     const game = games.find(game => game.name === gameName);
-    if(game === undefined) return; // note to self: make nonexistant game error handler
+    if(game === undefined) {
+      callback({success: false, reason: 'This game no longer exists!'});
+      return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game that no longer exists`);
+    }
+    if(game.started) {
+      callback({success: false, reason: 'This game has already started!'});
+      return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game that already started`);
+    }
 
-    game.addPlayer(socket.data.player);
+    game.addPlayer(player);
     socket.join(gameName);
     callback({success: true, game: game.lobbyData});
+  });
+  socket.on('leaveGame', (callback) => {
+    const player = socket.data.player;
+    const game = player.currentGame;
+    if(!game){
+      callback({success: false, reason: "You're already not in a game!"});
+      return console.error(`Player "${player.username}" (ID ${player.id}) tried to leave game but is already not in a game`);
+    }
+
+    socket.leave(game.name);
+    game.removePlayer(player.id);
+    callback({success: true});
   });
   socket.on('getGames', (callback) => {
     callback(games.map(game => game.lobbyData));

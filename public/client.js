@@ -282,9 +282,14 @@ function drawLandRing(ctx, r, spaces) {
 //#region GAME LOBBY
 
 function setupLobby() {
-  document.getElementById('lobby-buttons').children[0].addEventListener('click', createGame);
-  document.getElementById('lobby-buttons').children[1].addEventListener('click', getGames);
+  // main menu
+  document.getElementById('lobby-create').addEventListener('click', createGame);
+  document.getElementById('lobby-refresh').addEventListener('click', getGames);
   getGames();
+
+  // game room
+  document.getElementById('room-leave').addEventListener('click', leaveGame);
+  document.getElementById('room-ready').addEventListener('click', ready);
 }
 
 function showGame(game) {
@@ -330,7 +335,7 @@ async function joinGame({target}) {
   target.textContent = 'Joining...';
   try {
     const response = await socket.timeout(1000).emitWithAck('joinGame', this.name);
-    if(response.success){
+    if(response.success) {
       joinedGame(response.game);
     } else {
       target.textContent = 'Join Game';
@@ -351,7 +356,7 @@ async function createGame({target}) {
   target.textContent = 'Creating...';
   try {
     const response = await socket.timeout(1000).emitWithAck('createGame');
-    if(response.success){
+    if(response.success) {
       joinedGame(response.game);
     } else {
       target.textContent = 'Create Game';
@@ -375,6 +380,25 @@ function joinedGame(game) {
     const roomPlayer = document.createElement('p');
     roomPlayer.textContent = game.players[i];
     roomPlayers.appendChild(roomPlayer);
+  }
+}
+
+async function leaveGame({target}) {
+  target.textContent = 'Leaving...';
+  try {
+    const response = await socket.timeout(1000).emitWithAck('leaveGame');
+    if(response.success) {
+      changeGamePage('lobby');
+    } else {
+      target.textContent = 'Leave Game';
+      console.error('Error leaving game:', response.reason);
+      alert('Error leaving game: ' + response.reason);
+    }
+  } catch (e) {
+    target.textContent = 'Leave Game';
+    const errorMsg = 'Server did not respond in time to leave game request';
+    console.error(errorMsg);
+    alert(errorMsg);
   }
 }
 
