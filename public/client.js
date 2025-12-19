@@ -104,12 +104,10 @@ function setupSocket() {
     console.error('Invalid ID error for', event);
     alert('Invalid ID error for ' + event);
   });
-  socket.on('generateID', (id) => {
+  socket.on('generateID', (id, username) => {
     setCookie('id', id);
-    console.log('got ID from server:', id);
-
-    // default username
-    setUsername('unnamed' + Math.floor(Math.random()*1000));
+    setCookie('username', username);
+    document.getElementById('chat-input-username').value = username;
   });
 
   // chat

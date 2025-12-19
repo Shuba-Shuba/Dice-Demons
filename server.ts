@@ -9,7 +9,7 @@ import { SocketAddress } from 'net';
 //#region Interfaces
 interface ServerToClientEvents {
   // server
-  generateID: (id: string) => void;
+  generateID: (id: string, username: string) => void;
   
   // chat
   serverMessage: (msg: Message) => void;
@@ -286,24 +286,22 @@ server.listen(PORT, () => {
 function getCookies(socket: Socket): CookieData {
   var cookieObj: {
     id: string; 
-    username: string
+    username: string;
   } = {
     id: "",
-    username: "unnamed"
+    username: 'unnamed' + Math.floor(Math.random()*1000)
   };
   if(socket.handshake.headers.cookie && socket.handshake.headers.cookie.length > 0){
     let cookie = parse(socket.handshake.headers.cookie);
-    if(cookie.id) cookieObj.id = cookie.id
-    if(cookie.username) cookieObj.username = cookie.username
+    if(cookie.id) cookieObj.id = cookie.id;
+    if(cookie.username) cookieObj.username = cookie.username;
   }
   if(cookieObj.id === "") {
     // if client doesn't have a cookie, assign a new ID
     const id = crypto.randomUUID();
-    socket.emit('generateID', id);
+    socket.emit('generateID', id, cookieObj.username);
     cookieObj.id = id;
   }
-
-  //console.log("cookie obj:",cookieObj);
   return cookieObj;
 }
 
