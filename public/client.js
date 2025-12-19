@@ -109,8 +109,7 @@ function setupSocket() {
     console.log('got ID from server:', id);
 
     // default username
-    (document.getElementById('chat-input-username')).value = 'unnamed' + Math.floor(Math.random()*1000);
-    setUsername();
+    setUsername('unnamed' + Math.floor(Math.random()*1000));
   });
 
   // chat
