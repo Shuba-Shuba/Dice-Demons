@@ -323,6 +323,9 @@ function showGame(game) {
   room.appendChild(roomJoinButton);
 
   document.getElementById('lobby-rooms').appendChild(room);
+
+  // join game automatically if name matches hash
+  if(game.name === location.hash.substring(1).replaceAll('-',' ')) roomJoinButton.click();
 }
 
 async function joinGame({target}) {
@@ -334,12 +337,14 @@ async function joinGame({target}) {
       joinedGame(response.game);
     } else {
       target.textContent = 'Join Game';
+      history.replaceState(null,'','/');
       console.error('Error joining game:', response.reason);
       alert('Error joining game: ' + response.reason);
     }
   } catch (e) {
     target.textContent = 'Join Game';
-    const errorMsg = 'Server did not respond in time to create game request';
+    history.replaceState(null,'','/');
+    const errorMsg = 'Server did not respond in time to join game request';
     console.error(errorMsg);
     alert(errorMsg);
   }
@@ -367,6 +372,7 @@ async function createGame({target}) {
 function joinedGame(game) {
   changeGamePage('room');
   document.querySelector('#game-room h1').textContent = game.name;
+  location.hash = game.name.replaceAll(' ','-');
   const roomPlayers = document.getElementById('room-players');
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
