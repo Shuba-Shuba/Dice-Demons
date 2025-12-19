@@ -5,20 +5,31 @@ import {Server, Socket} from 'socket.io';
 import {parse} from 'cookie';
 import crypto from 'crypto';
 import path from 'path';
-
+import { SocketAddress } from 'net';
+//#region Interfaces
 interface ServerToClientEvents {
+  // server
   generateID: (id: string) => void;
+  
+  // chat
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
+
+  // game
   rollDice: (rolls: number[]) => void;
 }
 
 interface ClientToServerEvents {
+  // lobby
   createGame: (callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   joinGame: (gameName: string, callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
+  
+  // chat
   chatMessage: (msg: Message) => void;
   setUsername: (username: string, callback: (response: {success: boolean, reason?: string}) => void) => void;
+  
+  // game
   rollDice: () => void;
 }
 
@@ -42,7 +53,9 @@ interface CookieData {
   id: string;
   username: string;
 }
+//#endregion
 
+//#region Classes
 class Game {
   started: boolean;
   name: string;
@@ -75,6 +88,7 @@ class Game {
 
   addPlayer(player: Player): void {
     this.players.push(player);
+    player.currentGame = this;
   }
 }
 
@@ -82,19 +96,17 @@ class Player {
   id: string;
   username: string;
   tabs: number;
+  currentGame?: Game;
 
   constructor(data: CookieData) {
     this.id = data.id;
     this.username = data.username;
     this.tabs = 1;
   }
-  
-  get currentGame(): Game | undefined {
-    for(let i=0; i<games.length; i++) if(games[i].getPlayer(this.id)) return games[i];
-    return undefined;
-  }
 }
+//#endregion
 
+//#region Setup
 const domain = 'shubashuba.com';
 const appUnsecured = express();
 // redirect every single incoming http request to https
@@ -116,10 +128,11 @@ const io = new Server<
   SocketData
 >(server);
 const PORT = 443;
+//#endregion
 
+//#region Server
 // frontend
 app.use(express.static(path.join(__dirname,'public')));
-
 
 // io.emit -> everyone on server
 // socket.emit -> specific client
@@ -135,7 +148,7 @@ const words: {
 } = JSON.parse(fs.readFileSync("words.json", "utf-8"));
 
 io.on('connection', (socket) => {
-  // connection setup
+  //#region connection setup
   const data = getCookies(socket);
   const player = getPlayer(data);
   // if they edit their cookie while offline, use their data
@@ -170,7 +183,6 @@ io.on('connection', (socket) => {
   }
   // console.log(connectedClients);
 
-  // connection handlers
   socket.on('disconnect', () => {
     connectedClients[socket.data.player.id].tabs -= 1;
     if(connectedClients[socket.data.player.id].tabs === 0){
@@ -188,8 +200,9 @@ io.on('connection', (socket) => {
       // console.log(connectedClients);
     }
   });
+  //#endregion
 
-  // lobby handlers
+  //#region lobby handlers
   socket.on('createGame', (callback) => {
     if(socket.data.player.currentGame){
       callback({success: false, reason: "You're already in a game!"});
@@ -219,8 +232,9 @@ io.on('connection', (socket) => {
   socket.on('getGames', (callback) => {
     callback(games.map(game => game.lobbyData));
   });
+  //#endregion
   
-  // chat handlers
+  //#region chat handlers
   socket.on('chatMessage', (message) => {
     if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'createMessage');
 
@@ -245,21 +259,28 @@ io.on('connection', (socket) => {
 
     socket.data.player.username = username;
   });
+  //#endregion
 
-  // game handlers
+  //#region game handlers
   socket.on('rollDice', () => {
+    const game = socket.data.player.currentGame;
+    if(!game) return;
+
     const rolls: number[] = [];
     for(let i=0; i<3; i++) rolls.push(Math.floor(Math.random()*6) + 1);
     rolls.sort((a,b) => b-a);
-    io.emit('rollDice', rolls);
+
+    io.to(game.name).emit('rollDice', rolls);
   });
+  //#endregion
 });
 
 server.listen(PORT, () => {
   console.log('Server listening on port',PORT);
 });
+//#endregion
 
-
+//#region Connections & Lobby
 // reads cookies and returns object with relevant properties,
 // uses default values when cookie unavailable
 function getCookies(socket: Socket): CookieData {
@@ -326,3 +347,4 @@ function getPlayer(data: CookieData): Player {
   console.log("didn't find existing player object");
   return new Player(data);
 }
+//#endregion

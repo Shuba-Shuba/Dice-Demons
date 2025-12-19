@@ -122,11 +122,9 @@ function setupSocket() {
   });
 
   // game
-  socket.on('rollDice', (rolls) => {
-    // show rolls on screen
-    const dice = document.getElementById('dice-container').children;
-    for(let i=0; i<3; i++){
-      dice[i].innerHTML = `${rolls[i]}`;
+  socket.on('gameAction', (action, data) => {
+    switch(action){
+      case 'rollDice': rollDice(data); break;
     }
   });
 }
@@ -163,15 +161,20 @@ function rotate(element, rotation) {
   element.style.rotate = newRotation;
 }
 
-function rollDice() {
-  // server-side
-  socket.emit('rollDice');
+function rollDice({rolls}) {
+  // show dice rolls on screen
+  const dice = document.getElementById('dice-container').children;
+  for(let i=0; i<3; i++){
+    dice[i].innerHTML = `${rolls[i]}`;
+  }
 }
 
 function setupGame() {
   setupBoard();
   addEventListener('resize', resize);
-  document.getElementById('dice-container').addEventListener('click', rollDice);
+  document.getElementById('dice-container').addEventListener('click', () => {
+    socket.emit('gameAction', 'rollDice');
+  });
 }
 
 function setupBoard() {
