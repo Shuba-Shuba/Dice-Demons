@@ -5,7 +5,6 @@ import {Server, Socket} from 'socket.io';
 import {parse} from 'cookie';
 import crypto from 'crypto';
 import path from 'path';
-import { SocketAddress } from 'net';
 //#region Interfaces
 interface ServerToClientEvents {
   // server
@@ -151,7 +150,7 @@ io.on('connection', (socket) => {
   //#region connection setup
   const data = getCookies(socket);
   const {player, status} = getPlayer(data);
-  // if they edit their cookie while offline, use their data
+  // if they edit their username while offline, use their data
   player.username = data.username;
 
   socket.data.player = player;
@@ -327,7 +326,7 @@ function generateGameName(): string {
 
 
 // looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
-function getPlayer(data: CookieData): {player: Player, status: string} {
+function getPlayer(data: CookieData): {player: Player, status?: string} {
   const id = data.id;
 
   // already connected (extra tab)
@@ -340,6 +339,6 @@ function getPlayer(data: CookieData): {player: Player, status: string} {
   }
 
   // not in game
-  return {player: new Player(data), status: 'normal'};
+  return {player: new Player(data)};
 }
 //#endregion
