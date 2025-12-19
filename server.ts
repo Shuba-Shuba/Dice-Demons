@@ -116,8 +116,8 @@ appUnsecured.listen(80);
 
 const app = express();
 const options = {
-  key: fs.readFileSync("privkey.pem"),
-  cert: fs.readFileSync("fullchain.pem"),
+  key: fs.readFileSync('privkey.pem'),
+  cert: fs.readFileSync('fullchain.pem'),
 };
 const server = https.createServer(options, app);
 const io = new Server<
@@ -144,7 +144,7 @@ const words: {
   adjectives: string[];
   things: string[];
   doers: string[];
-} = JSON.parse(fs.readFileSync("words.json", "utf-8"));
+} = JSON.parse(fs.readFileSync('words.json', 'utf-8'));
 
 io.on('connection', (socket) => {
   //#region connection setup
@@ -282,7 +282,7 @@ function getCookies(socket: Socket): CookieData {
     id: string; 
     username: string;
   } = {
-    id: "",
+    id: '',
     username: 'unnamed' + Math.floor(Math.random()*1000)
   };
   if(socket.handshake.headers.cookie && socket.handshake.headers.cookie.length > 0){
@@ -290,7 +290,7 @@ function getCookies(socket: Socket): CookieData {
     if(cookie.id) cookieObj.id = cookie.id;
     if(cookie.username) cookieObj.username = cookie.username;
   }
-  if(cookieObj.id === "") {
+  if(cookieObj.id === '') {
     // if client doesn't have a cookie, assign a new ID
     const id = crypto.randomUUID();
     socket.emit('generateID', id, cookieObj.username);
@@ -310,14 +310,14 @@ function errorInvalidID(socket: Socket, event: string): void {
 // returns random unique game name
 function generateGameName(): string {
   // get 3 random words: adjective noun verb+ers
-  const name = words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + " " + words.things[Math.floor(Math.random()*words.things.length)] + " " + words.doers[Math.floor(Math.random()*words.doers.length)];
+  const name = words.adjectives[Math.floor(Math.random()*words.adjectives.length)] + ' ' + words.things[Math.floor(Math.random()*words.things.length)] + ' ' + words.doers[Math.floor(Math.random()*words.doers.length)];
   
   // do not repeat
   if(games.find(game => game.name === name)){
     // count up if all names exhausted
     if(words.doers.length * words.things.length * words.adjectives.length <= games.length){
       console.error('GAME NAMES EXHAUSTED');
-      return "Game #" + games.length;
+      return 'Game #' + games.length;
     }
     return generateGameName();
   }
