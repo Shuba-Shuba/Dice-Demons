@@ -289,7 +289,7 @@ function setupLobby() {
 
   // game room
   document.getElementById('room-leave').addEventListener('click', leaveGame);
-  document.getElementById('room-ready').addEventListener('click', ready);
+  //document.getElementById('room-ready').addEventListener('click', ready);
 }
 
 function showGame(game) {
@@ -332,19 +332,20 @@ function showGame(game) {
 
 async function joinGame({target}) {
   // this = game lobby data
+  const oldText = target.textContent;
   target.textContent = 'Joining...';
   try {
     const response = await socket.timeout(1000).emitWithAck('joinGame', this.name);
+    target.textContent = oldText;
     if(response.success) {
       joinedGame(response.game);
     } else {
-      target.textContent = 'Join Game';
       history.replaceState(null,'','/');
       console.error('Error joining game:', response.reason);
       alert('Error joining game: ' + response.reason);
     }
   } catch (e) {
-    target.textContent = 'Join Game';
+    target.textContent = oldText;
     history.replaceState(null,'','/');
     const errorMsg = 'Server did not respond in time to join game request';
     console.error(errorMsg);
@@ -353,18 +354,19 @@ async function joinGame({target}) {
 }
 
 async function createGame({target}) {
+  const oldText = target.textContent;
   target.textContent = 'Creating...';
   try {
     const response = await socket.timeout(1000).emitWithAck('createGame');
+    target.textContent = oldText;
     if(response.success) {
       joinedGame(response.game);
     } else {
-      target.textContent = 'Create Game';
       console.error('Error creating game:', response.reason);
       alert('Error creating game: ' + response.reason);
     }
   } catch (e) {
-    target.textContent = 'Create Game';
+    target.textContent = oldText;
     const errorMsg = 'Server did not respond in time to create game request';
     console.error(errorMsg);
     alert(errorMsg);
@@ -372,30 +374,33 @@ async function createGame({target}) {
 }
 
 function joinedGame(game) {
-  changeGamePage('room');
   document.querySelector('#game-room h1').textContent = game.name;
   location.hash = game.name.replaceAll(' ','');
   const roomPlayers = document.getElementById('room-players');
+  roomPlayers.innerHTML = '';
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
     roomPlayer.textContent = game.players[i];
     roomPlayers.appendChild(roomPlayer);
   }
+  changeGamePage('room');
 }
 
 async function leaveGame({target}) {
+  const oldText = target.textContent;
   target.textContent = 'Leaving...';
   try {
     const response = await socket.timeout(1000).emitWithAck('leaveGame');
+    target.textContent = oldText;
     if(response.success) {
+      history.replaceState(null,'','/');
       changeGamePage('lobby');
     } else {
-      target.textContent = 'Leave Game';
       console.error('Error leaving game:', response.reason);
       alert('Error leaving game: ' + response.reason);
     }
   } catch (e) {
-    target.textContent = 'Leave Game';
+    target.textContent = oldText;
     const errorMsg = 'Server did not respond in time to leave game request';
     console.error(errorMsg);
     alert(errorMsg);
@@ -409,8 +414,8 @@ async function getGames() {
     const games = await socket.timeout(1000).emitWithAck('getGames');
     
     if(games.length === 0) return lobby.innerHTML = 'No games found on server :('
-
     lobby.innerHTML = '';
+
     for(let i=0; i<games.length; i++){
       showGame(games[i]);
     }
