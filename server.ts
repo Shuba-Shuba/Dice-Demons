@@ -5,6 +5,7 @@ import {Server, Socket} from 'socket.io';
 import {parse} from 'cookie';
 import crypto from 'crypto';
 import path from 'path';
+import { HeapCodeStatistics } from 'v8';
 //#region Interfaces
 interface ServerToClientEvents {
   // server
@@ -104,10 +105,22 @@ class Player {
   tabs: number;
   currentGame?: Game;
 
+  // lobby data
+  ready?: boolean;
+  host?: boolean;
+
   constructor(data: CookieData) {
     this.id = data.id;
     this.username = data.username;
     this.tabs = 1;
+  }
+
+  get lobbyData() {
+    return {
+      username: this.username,
+      ready: this.ready,
+      host: this.ready
+    }
   }
 }
 //#endregion
