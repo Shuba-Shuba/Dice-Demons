@@ -84,7 +84,8 @@ class Game {
     this.players[i].currentGame = undefined;
     this.players.splice(i,1);
 
-    // this method should call a function to destroy this game if there's no players now
+    // remove from games list if no more players
+    if(this.players.length === 0) games.splice(games.indexOf(this),1);
   }
 
   getPlayer(id: string): Player | undefined {
