@@ -393,6 +393,7 @@ async function leaveGame({target}) {
     const response = await socket.timeout(1000).emitWithAck('leaveGame');
     target.textContent = oldText;
     if(response.success) {
+      getGames();
       history.replaceState(null,'','/');
       changeGamePage('lobby');
     } else {
