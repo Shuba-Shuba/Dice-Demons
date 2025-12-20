@@ -257,8 +257,6 @@ io.on('connection', (socket) => {
   
   //#region chat handlers
   socket.on('chatMessage', (message) => {
-    if(!connectedClients[socket.data.player.id]) return errorInvalidID(socket, 'createMessage');
-
     io.emit('chatMessage', {
       from: socket.data.player.username,
       text: message.text,
@@ -267,11 +265,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUsername', (username, callback) => {
-    if(!connectedClients[socket.data.player.id]){
-      callback({success: false, reason: 'Invalid user ID'});
-      return errorInvalidID(socket, 'setUsername');
-    }
-
     callback({success: true});
     socket.broadcast.emit('serverMessage', {
       text: `${socket.data.player.username} changed their username to ${username}`,
@@ -324,13 +317,6 @@ function getCookies(socket: Socket): CookieData {
     cookieObj.id = id;
   }
   return cookieObj;
-}
-
-
-// hopefully these never run
-function errorInvalidID(socket: Socket, event: string): void {
-  console.error(`Received ${event} event for invalid ID`);
-  socket.emit('invalidID', event);
 }
 
 
