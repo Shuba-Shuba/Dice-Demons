@@ -47,7 +47,13 @@ interface Message {
 interface GameLobbyData {
   started: boolean;
   name: string;
-  players: string[]; 
+  players: PlayerLobbyData[]; 
+}
+
+interface PlayerLobbyData {
+  username: string;
+  ready?: boolean;
+  host?: boolean;
 }
 
 interface CookieData {
@@ -75,7 +81,7 @@ class Game {
     return {
       started: this.started,
       name: this.name,
-      players: this.players.map(player => player.username)
+      players: this.players.map(player => player.lobbyData)
     }
   }
 
@@ -115,11 +121,11 @@ class Player {
     this.tabs = 1;
   }
 
-  get lobbyData() {
+  get lobbyData(): PlayerLobbyData {
     return {
       username: this.username,
       ready: this.ready,
-      host: this.ready
+      host: this.host
     }
   }
 }

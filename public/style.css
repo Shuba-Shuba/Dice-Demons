@@ -193,6 +193,7 @@ html, body {
 }
 
 #room-players {
+  padding: 5px;
   width: 100%;
   flex: 1;
   border: 1px solid black;
