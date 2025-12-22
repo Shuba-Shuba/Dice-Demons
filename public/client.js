@@ -25,17 +25,17 @@ function setupMenu() {
   fetch('pages.json')
     .then(response => response.json())
     .then(pages => {
-      for(var page in pages){
+      for(const page of pages){
         // create menu button
-        var button = document.createElement('button');
-        button.textContent = pages[page].title;
-        button.id = pages[page].id + '-menubutton';
+        const button = document.createElement('button');
+        button.textContent = page.title;
+        button.id = page.id + '-menubutton';
         button.addEventListener('click', changePage);
         button.addEventListener('click', resize);
         document.getElementById('menu').appendChild(button);
         // show initial page
-        if(pages[page].initial){
-          document.getElementById(pages[page].id).classList.add('selected');
+        if(page.initial){
+          document.getElementById(page.id).classList.add('selected');
           button.classList.add('selected');
         }
       }
@@ -348,7 +348,7 @@ async function joinGame({target}) {
       console.error('Error joining game:', response.reason);
       alert('Error joining game: ' + response.reason);
     }
-  } catch (e) {
+  } catch {
     target.textContent = oldText;
     history.replaceState(null,'','/');
     const errorMsg = 'Server did not respond in time to join game request';
@@ -369,7 +369,7 @@ async function createGame({target}) {
       console.error('Error creating game:', response.reason);
       alert('Error creating game: ' + response.reason);
     }
-  } catch (e) {
+  } catch {
     target.textContent = oldText;
     const errorMsg = 'Server did not respond in time to create game request';
     console.error(errorMsg);
@@ -408,7 +408,7 @@ async function leaveGame({target}) {
       console.error('Error leaving game:', response.reason);
       alert('Error leaving game: ' + response.reason);
     }
-  } catch (e) {
+  } catch {
     target.textContent = oldText;
     const errorMsg = 'Server did not respond in time to leave game request';
     console.error(errorMsg);
@@ -428,7 +428,7 @@ async function getGames() {
     for(let i=0; i<games.length; i++){
       showGame(games[i]);
     }
-  } catch (e) {
+  } catch {
     const errorMsg = 'Server did not respond in time to get game list request';
     console.error(errorMsg);
     lobby.textContent = errorMsg;
@@ -450,7 +450,7 @@ async function setUsername(username) {
       console.error(errorMsg);
       alert(errorMsg);
     }
-  } catch (e) {
+  } catch {
     const errorMsg = 'Server did not respond in time to set username request';
     console.error(errorMsg);
     showMessage(errorMsg);
@@ -470,14 +470,14 @@ function receiveMessage(txt) {
   showMessage(txt);
 
   // save message
-  var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
+  const chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
   if(chatLog === null) chatLog = [];
   chatLog.push(txt);
   sessionStorage.setItem('chatLog', JSON.stringify(chatLog));
 }
 
 function showMessage(txt) {
-  var p = document.createElement('p');
+  const p = document.createElement('p');
   p.textContent = txt;
   document.getElementById('chat-messages').appendChild(p);
   p.scrollIntoView();
@@ -505,9 +505,9 @@ function setupChat() {
   });
 
   // load chat history from session storage
-  var chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
-  if(chatLog !== null) for(const msg in chatLog){
-    showMessage(chatLog[msg]);
+  const chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
+  if(chatLog !== null) for(const msg of chatLog){
+    showMessage(msg);
   }
 }
 
