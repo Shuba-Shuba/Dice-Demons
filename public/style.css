@@ -179,8 +179,6 @@ html, body {
 
 .lobby-room p, .lobby-room h2, #game-room p {
   margin: 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
   font-size: medium;
 }
 

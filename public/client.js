@@ -98,11 +98,15 @@ function setupSocket() {
   socket.on('connect', () => {
     receiveMessage('Connected to server');
   });
-
-  // ID
-  socket.on('invalidID', (event) => {
-    console.error('Invalid ID error for', event);
-    alert('Invalid ID error for ' + event);
+  socket.on('status', (status, game) => {
+    //const extraTab = Math.floor(status/2) === 1;
+    const reconnected = status%2 === 1;
+    if(reconnected) {
+      if(game.started) console.log('reconnect to started game');
+      else joinedGame(game);
+    } else {
+      getGames();
+    }
   });
   socket.on('generateID', (id, username) => {
     setCookie('id', id);
@@ -119,11 +123,8 @@ function setupSocket() {
   });
 
   // game
-  socket.on('gameAction', (action, data) => {
-    switch(action){
-      case 'rollDice': rollDice(data); break;
-    }
-  });
+  socket.on('updateLobby', (game) => updateLobby(game));
+  socket.on('rollDice', (rolls) => rollDice(rolls));
 }
 
 //#endregion SERVER
@@ -158,11 +159,11 @@ function rotate(element, rotation) {
   element.style.rotate = newRotation;
 }
 
-function rollDice({rolls}) {
+function rollDice(rolls) {
   // show dice rolls on screen
   const dice = document.getElementById('dice-container').children;
   for(let i=0; i<3; i++){
-    dice[i].innerHTML = `${rolls[i]}`;
+    dice[i].textContent = rolls[i];
   }
 }
 
@@ -175,6 +176,9 @@ function setupGame() {
 }
 
 function setupBoard() {
+  const board = document.getElementById('board');
+  board.textContent = null;
+
   // create spawn ring
   const spawn = document.createElement('canvas');
   spawn.classList.add('board');
@@ -184,7 +188,7 @@ function setupBoard() {
   spawn.width = BOARD_PIXEL_RADIUS*2;
   spawn.height = BOARD_PIXEL_RADIUS*2;
   drawLandRing(spawn.getContext('2d'), BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
-  document.getElementById('board').appendChild(spawn);
+  board.appendChild(spawn);
 
   // create outer rings
   for(let i=1; i<=BOARD_RING_COUNT; i++){
@@ -202,7 +206,7 @@ function setupBoard() {
       BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH,
       BOARD_SPAWN_SPACES*Math.pow(2, i)
     );
-    document.getElementById('board').appendChild(bridgeCanvas);
+    board.appendChild(bridgeCanvas);
 
     const landCanvas = document.createElement('canvas');
     landCanvas.classList.add('board');
@@ -216,7 +220,7 @@ function setupBoard() {
       BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH,
       BOARD_SPAWN_SPACES*Math.pow(2, i)
     );
-    document.getElementById('board').appendChild(landCanvas);
+    board.appendChild(landCanvas);
   }
 }
 
@@ -285,7 +289,6 @@ function setupLobby() {
   // main menu
   document.getElementById('lobby-create').addEventListener('click', createGame);
   document.getElementById('lobby-refresh').addEventListener('click', getGames);
-  getGames();
 
   // game room
   document.getElementById('room-leave').addEventListener('click', leaveGame);
@@ -306,7 +309,8 @@ function showGame(game) {
   else roomStarted.textContent = 'In lobby';
   roomInfo.appendChild(roomStarted);
   const roomPlayerCount = document.createElement('p');
-  roomPlayerCount.textContent = `${game.players.length} players`;
+  if(game.players.length === 1) roomPlayerCount.textContent = '1 player';
+  else roomPlayerCount.textContent = `${game.players.length} players`;
   roomInfo.appendChild(roomPlayerCount);
   room.appendChild(roomInfo);
 
@@ -314,7 +318,7 @@ function showGame(game) {
   roomPlayers.classList.add('lobby-room-players');
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
-    roomPlayer.textContent = game.players[i];
+    roomPlayer.textContent = game.players[i].username;
     roomPlayers.appendChild(roomPlayer);
   }
   room.appendChild(roomPlayers);
@@ -374,16 +378,20 @@ async function createGame({target}) {
 }
 
 function joinedGame(game) {
-  document.querySelector('#game-room h1').textContent = game.name;
+  updateLobby(game);
   location.hash = game.name.replaceAll(' ','');
+  changeGamePage('room');
+}
+
+function updateLobby(game) {
+  document.querySelector('#game-room h1').textContent = game.name;
   const roomPlayers = document.getElementById('room-players');
-  roomPlayers.innerHTML = '';
+  roomPlayers.textContent = null;
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
-    roomPlayer.textContent = game.players[i];
+    roomPlayer.textContent = game.players[i].username;
     roomPlayers.appendChild(roomPlayer);
   }
-  changeGamePage('room');
 }
 
 async function leaveGame({target}) {
@@ -410,12 +418,12 @@ async function leaveGame({target}) {
 
 async function getGames() {
   const lobby = document.getElementById('lobby-rooms');
-  lobby.innerHTML = 'loading...';
+  lobby.textContent = 'loading...';
   try {
     const games = await socket.timeout(1000).emitWithAck('getGames');
     
-    if(games.length === 0) return lobby.innerHTML = 'No games found on server :('
-    lobby.innerHTML = '';
+    if(games.length === 0) return lobby.textContent = 'No games found on server :('
+    lobby.textContent = null;
 
     for(let i=0; i<games.length; i++){
       showGame(games[i]);
@@ -423,7 +431,7 @@ async function getGames() {
   } catch (e) {
     const errorMsg = 'Server did not respond in time to get game list request';
     console.error(errorMsg);
-    lobby.innerHTML = errorMsg;
+    lobby.textContent = errorMsg;
   }
 }
 

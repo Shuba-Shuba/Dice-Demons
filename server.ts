@@ -10,12 +10,14 @@ import { HeapCodeStatistics } from 'v8';
 interface ServerToClientEvents {
   // server
   generateID: (id: string, username: string) => void;
+  status: (status: number, game?: GameLobbyData) => void;
 
   // chat
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
 
   // game
+  updateLobby: (game: GameLobbyData) => void;
   rollDice: (rolls: number[]) => void;
 }
 
@@ -175,47 +177,46 @@ const words: {
 io.on('connection', (socket) => {
   //#region connection setup
   const data = getCookies(socket);
-  const {player, status} = getPlayer(data);
+  const {player, extraTab, reconnected} = getPlayer(data);
   // if they edit their username while offline, use their data
   player.username = data.username;
 
   socket.data.player = player;
 
-  switch(status){
-    case 'extra tab':
-      socket.broadcast.emit('serverMessage', {
-        text: `${player.username} opened an extra tab`,
-        createdAt: Date.now()
-      });
-      player.tabs += 1;
-      break;
-    case 'reconnect':
-      connectedClients[player.id] = player;
-      player.tabs = 1;
-      socket.broadcast.emit('serverMessage', {
-        text: `${player.username} reconnected`,
-        createdAt: Date.now()
-      });
-      break;
-    default:
-      connectedClients[player.id] = player;
-      socket.broadcast.emit('serverMessage', {
-        text: `${player.username} joined`,
-        createdAt: Date.now()
-      });
+  if(extraTab) {
+    socket.broadcast.emit('serverMessage', {
+      text: `${player.username} opened an extra tab`,
+      createdAt: Date.now()
+    });
+    player.tabs += 1; // tab-counting will be replaced with disconnecting old tabs
+  } else if(reconnected) {
+    connectedClients[player.id] = player;
+    player.tabs = 1;
+    socket.broadcast.emit('serverMessage', {
+      text: `${player.username} reconnected`,
+      createdAt: Date.now()
+    });
+  } else {
+    connectedClients[player.id] = player;
+    socket.broadcast.emit('serverMessage', {
+      text: `${player.username} joined`,
+      createdAt: Date.now()
+    });
   }
+  socket.emit('status', 2*Number(extraTab) + Number(reconnected), player.currentGame?.lobbyData);
 
   socket.on('disconnect', () => {
-    socket.data.player.tabs -= 1;
-    if(socket.data.player.tabs === 0){
+    const player = socket.data.player;
+    player.tabs -= 1;
+    if(player.tabs === 0){
       socket.broadcast.emit('serverMessage', {
         text: `${player.username} disconnected`,
         createdAt: Date.now()
       });
-      delete connectedClients[socket.data.player.id];
+      delete connectedClients[player.id];
     } else {
       socket.broadcast.emit('serverMessage', {
-        text: `${socket.data.player.username} closed an extra tab`,
+        text: `${player.username} closed an extra tab`,
         createdAt: Date.now()
       });
     }
@@ -245,7 +246,7 @@ io.on('connection', (socket) => {
     }
     
     const game = games.find(game => game.name === gameName);
-    if(game === undefined) {
+    if(!game) {
       callback({success: false, reason: 'This game no longer exists!'});
       return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game that no longer exists`);
     }
@@ -255,6 +256,7 @@ io.on('connection', (socket) => {
     }
 
     game.addPlayer(player);
+    io.to(gameName).emit('updateLobby', game.lobbyData);
     socket.join(gameName);
     callback({success: true, game: game.lobbyData});
   });
@@ -266,8 +268,9 @@ io.on('connection', (socket) => {
       return console.error(`Player "${player.username}" (ID ${player.id}) tried to leave game but is already not in a game`);
     }
 
-    socket.leave(game.name);
     game.removePlayer(player.id);
+    io.to(game.name).emit('updateLobby', game.lobbyData);
+    socket.leave(game.name);
     callback({success: true});
   });
   socket.on('getGames', (callback) => {
@@ -359,19 +362,20 @@ function generateGameName(): string {
 
 
 // looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
-function getPlayer(data: CookieData): {player: Player, status?: string} {
+function getPlayer(data: CookieData): {player: Player, extraTab: boolean, reconnected: boolean} {
   const id = data.id;
 
   // already connected (extra tab)
-  if(connectedClients[id]) return {player: connectedClients[id], status: 'extra tab'};
+  const p = connectedClients[id];
+  if(p) return {player: p, extraTab: true, reconnected: Boolean(p.currentGame)};
 
   // reconnecting to game
   for(let i=0; i<games.length; i++){
     const p = games[i].getPlayer(id);
-    if(p) return {player: p, status: 'reconnect'};
+    if(p) return {player: p, extraTab: false, reconnected: true};
   }
 
   // not in game
-  return {player: new Player(data)};
+  return {player: new Player(data), extraTab: false, reconnected: false};
 }
 //#endregion
