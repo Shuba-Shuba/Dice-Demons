@@ -50,10 +50,14 @@ html, body {
 }
 
 #rules ol ::marker,
-#rules ol h3 {
+#rules ol hgroup h3 {
   font-size: 1.17em;
   font-weight: bold;
   margin: 1em 0 0 0;
+}
+
+#rules ol hgroup p {
+  margin: 0 0 1em 0;
 }
 
 #rules > hgroup {
