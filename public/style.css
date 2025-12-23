@@ -169,7 +169,7 @@ html, body {
 
 #lobby-buttons button,
 #room-controls button {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   padding: 2em;
 }
 
