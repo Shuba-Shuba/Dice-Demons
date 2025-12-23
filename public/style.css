@@ -49,6 +49,29 @@ html, body {
   padding: var(--page-margin);
 }
 
+#rules ol ::marker,
+#rules ol h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 1em 0 0 0;
+}
+
+#rules > hgroup {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+}
+
+#rules > hgroup p {
+  font-size: 1.2em;
+  margin: 0;
+}
+
+#rules hgroup h1 {
+  margin: 0;
+}
+
 #chat.selected {
   display: flex;
   flex-flow: column;
@@ -117,7 +140,8 @@ html, body {
   display: none;
 }
 
-#game-lobby.shown, #game-room.shown {
+#game-lobby.shown,
+#game-room.shown {
   display: flex;
   flex-flow: column;
   height: 100%;
@@ -131,14 +155,16 @@ html, body {
   text-align: center;
 }
 
-#lobby-buttons, #room-controls {
+#lobby-buttons,
+#room-controls {
   width: 100%;
   display: flex;
   flex-flow: row;
   gap: 1em;
 }
 
-#lobby-buttons button, #room-controls button {
+#lobby-buttons button,
+#room-controls button {
   flex: 1 1 auto;
   padding: 2em;
 }
@@ -177,7 +203,9 @@ html, body {
   column-gap: 1em;
 }
 
-.lobby-room p, .lobby-room h2, #game-room p {
+.lobby-room h2,
+.lobby-room p,
+#game-room p {
   margin: 0;
   font-size: medium;
 }

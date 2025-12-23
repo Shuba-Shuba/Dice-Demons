@@ -66,34 +66,40 @@
         </section>
       </div>
       <section class="page" id="rules">
-        <h1>Dice is health, strength, and money</h1>
+        <hgroup>
+          <h1>Meadow of Mages</h1>
+          <p>Dice as health & power</p>
+        </hgroup>
         <h2>Board</h2>
-        <p>The board is made up of 2 rings, with a set of bridges between them</p>
+        <p>The board is made up of a center island, and 2 land rings. All are surrounded by water, with bridges between each ring and the island.</p>
         <ul>
-          <li>Players start on the inner ring</li>
-          <li>Monster starts on the outer ring</li>
-          <li>The bridges move every turn</li>
+          <li>Players start on the center island</li>
+          <li>One monster starts on the outermost ring, on a random space</li>
         </ul>
         <h2>Dice</h2>
-        <p>Players start with no dice<br>Die pickups start on all non-wall spaces on outer ring</p>
+        <p>Dice are resources that players can pick up from around the board. Having more dice makes you stronger in combat, and dice can also be spent to do special actions on your turn.</p>
+        <p>Players start with no dice, and may have up to a maximum of 3. Dice pickups start on random spaces on the rings, and are renewable.</p>
         <h2>Win condition</h2>
-        <p>First player to get back to the middle with the trinket and 3 dice wins</p>
+        <p>First player to get back to the middle with the trinket and 3 dice wins. The trinket is obtained by winning a fight against a monster, or a player that already got a trinket.</p>
         <h2>On your turn</h2>
         <ol>
-          <li>Movement: roll 3 dice<ul>
-            <li>Monster moves lowest number, fan moves median number, player moves highest number<ul>
+          <li><h3>Movement</h3>
+            Roll three D6s<ul>
+            <li>Monster moves lowest number, bridges move median number, player moves highest number<ul>
               <li>You control how all 3 of these things move</li>
               <li>Move these 3 in any order<ul>
                 <li>You can also split up movement (e.g. if player moves 3, you can first move 2, next move something else, and then move player 1)</li>
               </ul></li>
             </ul></li>
-            <li>If the player lands exactly on a die, they pick it up<ul>
+            <li>If a player walks over a die on the board, they pick it up<ul>
               <li>Max 3 dice<ul>
                 <li>If you already have 3 dice, you can’t pick up any more</li>
               </ul></li>
+              <li>Dice pickups are renewable: when you pick a die up, another one spawns somewhere else on the board</li>
             </ul></li>
           </ul></li>
-          <li>Dice sacrifices, OPTIONAL: sacrifice dice any number of times to do things<ul>
+          <li><h3>Dice sacrifices - OPTIONAL</h3>
+            Any number of times, sacrifice 1 die to do any of the following:<ul>
             <li>Wall placement: costs 1 die<ul>
               <li>Roll a die for number of walls to get</li>
               <li>Place new walls OR take control of existing walls owned by other players</li>
@@ -103,36 +109,45 @@
             <li>Summon monster: costs 1 die<ul>
               <li>Summon a new monster anywhere on the board, except on top of a player</li>
             </ul></li>
-            <li>After sacrificing a die, a die pickup spawns on the farthest away non-wall space on the outer ring</li>
+            <li>After sacrificing a die, a die pickup spawns on a random non-wall space on the outer ring</li>
           </ul></li>
-          <li>Player vs. Monster combat: If the monster is on the same space as a player, then they must fight; if adjacent to monster, choose whether or not to fight:<ul>
-            <li>Monster rolls 3 dice</li>
-            <li>Player rolls however many dice they have (0 to 4)</li>
+          <li><h3>Combat</h3>
+            If a player or monster lands on a space occupied by a player, then they must fight<ul>
+            <li>The party who lands on the other (i.e. who moved most recently) is the "attacker"</li>
+            <li>Monsters roll 2 dice</li>
+            <li>Players roll however many dice they have (0 to 3)</li>
             <li>Highest sum of rolled dice wins fight<ul>
-              <li>If you have 0 dice you are guaranteed to lose</li>
-              <li>Both reroll if tied</li>
-              <li>If player wins fight:<ul>
-                <li>Get a trinket<ul>
-                  <li>1. Max 2 trinkets in circulation</li>
+              <li>If tied:<ul>
+                <li>Player vs Monster: Monster wins</li>
+                <li>Player vs Player: Both reroll until not tied*<ul>
+                  <li>*If both players have zero dice, attacker wins</li>
                 </ul></li>
               </ul></li>
-              <li>If monster wins fight:<ul>
+              <li>If player loses (against either player or monster):<ul>
                 <li>Player loses a die<ul>
-                  <li>If you already have zero dice before losing one, go back to the middle instead</li>
+                  <li>If you already have zero dice before losing one, go back to the center instead</li>
                 </ul></li>
                 <li>Player loses a trinket if they have any</li>
-                <li>Monster may attack another player if adjacent</li>
-                <li>Player decides which adjacent space to go to after fight</li>
+                <li>Winner pushes player to adjacent space:<ul>
+                  <li>If winner is player, winner chooses which</li>
+                  <li>If winner is monster and attacker is monster, the player who moved the monster chooses which</li>
+                  <li>If winner is monster and attacker is player, player goes back to previous space</li>
+                  <li>N/A if sent back to center</li>
+                </ul></li>
+                <li>Nothing happens to the monster itself if it wins</li>
+              </ul></li>
+              <li>If player wins against monster:<ul>
+                <li>Get a trinket<ul>
+                  <li>Max 1 trinket on any one player</li>
+                  <li>Max 2 trinkets in circulation (no trinket reward if already 2 amongst players)</li>
+                </ul></li>
+                <li>Monster dies</li>
+              </ul></li>
+              <li>If player wins against another player:<ul>
+                <li>If loser has a trinket, winner steals it</li>
+                <li>If loser has walls, winner may remove up to a die roll's amount of loser's walls</li>
               </ul></li>
             </ul></li>
-          </ul></li>
-          <li>Player vs. Player combat: If player lands on same space as another player, they must fight; if adjacent to another player, player who moved chooses whether or not to fight:<ul>
-            <li>Extends rules from player vs. monster</li>
-            <li>Winning player steals a trinket from the losing player<ul>
-              <li>If the loser doesn’t have a trinket, the winner doesn’t get one</li>
-            </ul></li>
-            <li>Whoever moved most recently must move away, winning player decides which adjacent space they go to</li>
-            <li>Losing player loses a die roll’s amount of walls, chosen by the winner</li>
           </ul></li>
         </ol>
       </section>
