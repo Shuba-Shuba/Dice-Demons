@@ -470,8 +470,7 @@ function receiveMessage(txt) {
   showMessage(txt);
 
   // save message
-  const chatLog = JSON.parse(sessionStorage.getItem('chatLog'));
-  if(chatLog === null) chatLog = [];
+  const chatLog = JSON.parse(sessionStorage.getItem('chatLog')) ?? [];
   chatLog.push(txt);
   sessionStorage.setItem('chatLog', JSON.stringify(chatLog));
 }
