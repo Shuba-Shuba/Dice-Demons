@@ -49,6 +49,7 @@ html, body {
   padding: var(--page-margin);
 }
 
+/* looks like default h3 */
 #rules ol ::marker,
 #rules ol hgroup h3 {
   font-size: 1.17em;
@@ -64,7 +65,7 @@ html, body {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  width: max-content;
+  width: 100%;
 }
 
 #rules > hgroup p {
@@ -160,17 +161,42 @@ html, body {
 }
 
 #lobby-buttons,
-#room-controls {
+#room-buttons {
+  flex: 0 0 10%;
   width: 100%;
   display: flex;
   flex-flow: row;
   gap: 1em;
 }
 
-#lobby-buttons button,
-#room-controls button {
+.lobby-button {
   flex: 1 1 0;
-  padding: 2em;
+  padding: 0;
+  border: 1px solid black;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
+
+/* looks like default button */
+.lobby-button {
+  background: rgb(233,233,241);
+}
+
+.lobby-button {
+  font: 1rem sans-serif;
+  user-select: none;
+}
+
+.lobby-button:hover,
+.lobby-button:focus {
+  background: rgb(207,207,214);
+}
+
+.lobby-button:active {
+  background: rgb(181,181,188);
 }
 
 #lobby-rooms {
