@@ -21,9 +21,8 @@ setupChat();
 //#region WINDOW & NAV
 
 function setupMenu() {
-  // create menu buttons
+  // set up menu buttons
   for(const button of document.getElementById('menu').children){
-    // create menu button
     button.addEventListener('click', changePage);
     button.addEventListener('click', resize);
   };
