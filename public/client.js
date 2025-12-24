@@ -22,35 +22,15 @@ setupChat();
 
 function setupMenu() {
   // create menu buttons
-  const pages = [
-    {
-      title: "Game",
-      id: "game",
-      initial: true
-    },
-    {
-      title: "Rules",
-      id: "rules"
-    },
-    {
-      title: "Chat",
-      id: "chat"
-    }
-  ];
-  for(const page of pages){
+  for(const button of document.getElementById('menu').children){
     // create menu button
-    const button = document.createElement('button');
-    button.textContent = page.title;
-    button.id = page.id + '-menubutton';
     button.addEventListener('click', changePage);
     button.addEventListener('click', resize);
-    document.getElementById('menu').appendChild(button);
-    // show initial page
-    if(page.initial){
-      document.getElementById(page.id).classList.add('selected');
-      button.classList.add('selected');
-    }
-  }
+  };
+
+  // show initial page (game)
+  document.getElementById('game-menubutton').classList.add('selected');
+  document.getElementById('game').classList.add('selected');
 }
 
 function resize() {
