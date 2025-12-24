@@ -7,7 +7,7 @@ const BOARD_SPACES_PER_BRIDGE = 8; // spaces counted on outside
 const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
 const SPIN_ANIMATION_DURATION = 200;
-const socket = io();
+const socket = io('wss://shubashuba.com');
 //#endregion
 
 //#region RUN SETUP

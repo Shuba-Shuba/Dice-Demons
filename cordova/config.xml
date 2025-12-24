@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.shubashuba.dice-demons" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Dice Demons</name>
+    <description>
+        Native app for shubashuba.com
+    </description>
+    <author email="" href="https://shubashuba.com">
+        Shuba Shuba
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+</widget>
