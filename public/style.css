@@ -41,7 +41,7 @@ html, body {
 
 #fullscreen.fullscreen {
   font-weight: bold;
-  line-height: 0.9em;
+  line-height: 1em;
 }
 
 #menu button.selected {
