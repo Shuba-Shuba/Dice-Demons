@@ -102,9 +102,14 @@ function setupSocket() {
   socket.on('connect', () => {
     receiveMessage('Connected to server');
   });
-  socket.on('status', (status, game) => {
-    //const extraTab = Math.floor(status/2) === 1;
-    const reconnected = status%2 === 1;
+  socket.on('oldTab', () => {
+    const msg = 'You opened an extra tab, so this one has been disconnected.';
+    document.exitFullscreen();
+    document.body.textContent = msg;
+    document.title = 'Disconnected - ' + document.title;
+    alert(msg);
+  });
+  socket.on('status', (reconnected, game) => {
     if(reconnected) {
       if(game.started) console.log('reconnect to started game');
       else joinedGame(game);
@@ -296,7 +301,7 @@ function setupLobby() {
 
   // game room
   document.getElementById('room-leave').addEventListener('click', leaveGame);
-  //document.getElementById('room-ready').addEventListener('click', ready);
+  document.getElementById('room-ready').addEventListener('click', toggleReady);
 }
 
 function showGame(game) {
@@ -393,8 +398,20 @@ function updateLobby(game) {
   roomPlayers.textContent = null;
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('p');
-    roomPlayer.textContent = game.players[i].username;
+    let playerText = game.players[i].username;
+    if(game.players[i].ready) playerText += ' - ready ✅';
+    else playerText += ' - not ready ❌';
+    roomPlayer.textContent = playerText;
     roomPlayers.appendChild(roomPlayer);
+  }
+  const username = getCookie('username');
+  const readyButton = document.getElementById('room-ready');
+  if(game.players.find(player => player.username === username)?.ready) {
+    readyButton.classList.add('ready');
+    readyButton.textContent = 'Ready ✅';
+  } else {
+    readyButton.classList.remove('ready');
+    readyButton.textContent = 'Not Ready ❌';
   }
 }
 
@@ -417,6 +434,23 @@ async function leaveGame({target}) {
     const errorMsg = 'Server did not respond in time to leave game request';
     console.error(errorMsg);
     alert(errorMsg);
+  }
+}
+
+async function toggleReady({target}) {
+  let ready = target.classList.toggle('ready');
+  if(ready) target.textContent = 'Readying...';
+  else target.textContent = 'Unreadying...';
+  try {
+    await socket.timeout(1000).emitWithAck('setReady', ready);
+  } catch {
+    ready = target.classList.toggle('ready');
+    const errorMsg = 'Server did not respond in time to toggle readiness request';
+    console.error(errorMsg);
+    alert(errorMsg);
+  } finally {
+    if(ready) target.textContent = 'Ready ✅';
+    else target.textContent = 'Not Ready ❌';
   }
 }
 

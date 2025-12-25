@@ -9,7 +9,8 @@ import path from 'path';
 interface ServerToClientEvents {
   // server
   generateID: (id: string, username: string) => void;
-  status: (status: number, game?: GameLobbyData) => void;
+  status: (reconnected: boolean, game?: GameLobbyData) => void;
+  oldTab: () => void;
 
   // chat
   serverMessage: (msg: Message) => void;
@@ -26,6 +27,7 @@ interface ClientToServerEvents {
   joinGame: (gameName: string, callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
   leaveGame: (callback: (response: {success: boolean, reason?: string}) => void) => void;
+  setReady: (ready: boolean, callback: () => void) => void;
 
   // chat
   chatMessage: (msg: Message) => void;
@@ -109,7 +111,6 @@ class Game {
 class Player {
   id: string;
   username: string;
-  tabs: number;
   currentGame?: Game;
 
   // lobby data
@@ -119,7 +120,6 @@ class Player {
   constructor(data: CookieData) {
     this.id = data.id;
     this.username = data.username;
-    this.tabs = 1;
   }
 
   get lobbyData(): PlayerLobbyData {
@@ -176,25 +176,25 @@ const words: {
 io.on('connection', (socket) => {
   //#region connection setup
   const data = getCookies(socket);
-  const {player, extraTab, reconnected} = getPlayer(data);
+  const {player, extraTab} = getPlayer(data);
   // if they edit their username while offline, use their data
   player.username = data.username;
 
   socket.data.player = player;
 
   if(extraTab) {
-    socket.broadcast.emit('serverMessage', {
-      text: `${player.username} opened an extra tab`,
-      createdAt: Date.now()
-    });
-    player.tabs += 1; // tab-counting will be replaced with disconnecting old tabs
-  } else if(reconnected) {
+    disconnectOldTabs(socket, player);
+  }
+  if(player.currentGame) {
     connectedClients[player.id] = player;
-    player.tabs = 1;
     socket.broadcast.emit('serverMessage', {
       text: `${player.username} reconnected`,
       createdAt: Date.now()
     });
+    const game = player.currentGame;
+    player.ready = false;
+    io.to(game.name).emit('updateLobby', game.lobbyData);
+    socket.join(game.name);
   } else {
     connectedClients[player.id] = player;
     socket.broadcast.emit('serverMessage', {
@@ -202,23 +202,16 @@ io.on('connection', (socket) => {
       createdAt: Date.now()
     });
   }
-  socket.emit('status', 2*Number(extraTab) + Number(reconnected), player.currentGame?.lobbyData);
+  socket.emit('status', Boolean(player.currentGame), player.currentGame?.lobbyData);
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', (reason) => {
+    if(reason === 'server namespace disconnect') return;
     const player = socket.data.player;
-    player.tabs -= 1;
-    if(player.tabs === 0){
-      socket.broadcast.emit('serverMessage', {
-        text: `${player.username} disconnected`,
-        createdAt: Date.now()
-      });
-      delete connectedClients[player.id];
-    } else {
-      socket.broadcast.emit('serverMessage', {
-        text: `${player.username} closed an extra tab`,
-        createdAt: Date.now()
-      });
-    }
+    socket.broadcast.emit('serverMessage', {
+      text: `${player.username} disconnected`,
+      createdAt: Date.now()
+    });
+    delete connectedClients[player.id];
   });
   //#endregion
 
@@ -233,6 +226,7 @@ io.on('connection', (socket) => {
     const game = new Game(generateGameName());
     games.push(game);
 
+    player.ready = false;
     game.addPlayer(player);
     socket.join(game.name);
     callback({success: true, game: game.lobbyData});
@@ -254,6 +248,7 @@ io.on('connection', (socket) => {
       return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game that already started`);
     }
 
+    player.ready = false;
     game.addPlayer(player);
     io.to(gameName).emit('updateLobby', game.lobbyData);
     socket.join(gameName);
@@ -271,6 +266,12 @@ io.on('connection', (socket) => {
     io.to(game.name).emit('updateLobby', game.lobbyData);
     socket.leave(game.name);
     callback({success: true});
+  });
+  socket.on('setReady', (ready, callback) => {
+    const player = socket.data.player;
+    player.ready = ready;
+    if(player.currentGame) io.to(player.currentGame.name).emit('updateLobby', player.currentGame.lobbyData);
+    callback();
   });
   socket.on('getGames', (callback) => {
     callback(games.map(game => game.lobbyData));
@@ -341,7 +342,6 @@ function getCookies(socket: Socket): CookieData {
   return cookieObj;
 }
 
-
 // returns random unique game name
 function generateGameName(): string {
   // get 3 random words: adjective noun verb+ers
@@ -359,22 +359,31 @@ function generateGameName(): string {
   return name;
 }
 
-
 // looks through connectedClients and games to find existing player with given ID, otherwise returns new player object
-function getPlayer(data: CookieData): {player: Player, extraTab: boolean, reconnected: boolean} {
+function getPlayer(data: CookieData): {player: Player, extraTab: boolean} {
   const id = data.id;
 
   // already connected (extra tab)
   const p = connectedClients[id];
-  if(p) return {player: p, extraTab: true, reconnected: Boolean(p.currentGame)};
+  if(p) return {player: p, extraTab: true};
 
   // reconnecting to game
   for(let i=0; i<games.length; i++){
     const p = games[i].getPlayer(id);
-    if(p) return {player: p, extraTab: false, reconnected: true};
+    if(p) return {player: p, extraTab: false};
   }
 
   // not in game
-  return {player: new Player(data), extraTab: false, reconnected: false};
+  return {player: new Player(data), extraTab: false};
+}
+
+// looks through all sockets, except given socket, and notifies & disconnects all with matching player
+async function disconnectOldTabs(socket: Socket, player: Player) {
+  const sockets = await io.fetchSockets();
+  sockets.forEach(s => {
+    if(s.data.player !== player || s.id === socket.id) return;
+    s.emit('oldTab');
+    s.disconnect();
+  });
 }
 //#endregion
