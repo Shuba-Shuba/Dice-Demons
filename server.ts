@@ -263,8 +263,8 @@ io.on('connection', (socket) => {
     }
 
     game.removePlayer(player.id);
-    io.to(game.name).emit('updateLobby', game.lobbyData);
     socket.leave(game.name);
+    io.to(game.name).emit('updateLobby', game.lobbyData);
     callback({success: true});
   });
   socket.on('setReady', (ready, callback) => {
