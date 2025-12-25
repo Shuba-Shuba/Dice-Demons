@@ -294,9 +294,9 @@ io.on('connection', (socket) => {
       createdAt: Date.now()
     });
     player.username = username;
-    if(player.currentGame) io.to(player.currentGame.name).emit('updateLobby', player.currentGame.lobbyData);
-
+    
     callback({success: true});
+    if(player.currentGame) io.to(player.currentGame.name).emit('updateLobby', player.currentGame.lobbyData);
   });
   //#endregion
 

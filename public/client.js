@@ -410,7 +410,7 @@ function updateLobby(game) {
   }
   const username = getCookie('username');
   const readyButton = document.getElementById('room-ready');
-  if(game.players.find(player => player.username === username)?.ready) {
+  if(game.players.find(player => player.username === username).ready) {
     readyButton.classList.add('ready');
     readyButton.textContent = 'Ready ✅';
   } else {
