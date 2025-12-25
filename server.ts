@@ -288,13 +288,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUsername', (username, callback) => {
-    callback({success: true});
+    const player = socket.data.player;
     socket.broadcast.emit('serverMessage', {
-      text: `${socket.data.player.username} changed their username to ${username}`,
+      text: `${player.username} changed their username to ${username}`,
       createdAt: Date.now()
     });
+    player.username = username;
+    if(player.currentGame) io.to(player.currentGame.name).emit('updateLobby', player.currentGame.lobbyData);
 
-    socket.data.player.username = username;
+    callback({success: true});
   });
   //#endregion
 
