@@ -30,6 +30,16 @@ function setupMenu() {
   // show initial page (game)
   document.getElementById('game-menubutton').classList.add('selected');
   document.getElementById('game').classList.add('selected');
+
+  // TEMPORARY - REPLACE WITH SETTINGS PAGE
+  const fullscreenButton = document.createElement('button');
+  fullscreenButton.addEventListener('click', () => document.body.requestFullscreen());
+  menu.appendChild(fullscreenButton);
+  fullscreenButton.textContent = '⛶';
+  fullscreenButton.style.fontSize = '2em';
+  fullscreenButton.style.fontWeight = 'bold';
+  fullscreenButton.style.height = '1.66666666667em';
+  document.getElementById('container').style.background = 'white';
 }
 
 function resize() {
