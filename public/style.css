@@ -13,6 +13,11 @@ html, body {
   height: 100%;
 }
 
+#container.fullscreen {
+  background: white;
+  overflow: scroll;
+}
+
 #menu {
   background-color: black;
   flex: 0 1 auto;
@@ -27,6 +32,16 @@ html, body {
 #menu button {
   flex: 1 1;
   height: 4em;
+}
+
+#fullscreen:not(.fullscreen) {
+  font-size: 2em;
+  font-weight: 'bold';
+  height: 1.6666667em;
+}
+
+#fullscreen.fullscreen {
+  line-height: 0.9em;
 }
 
 #menu button.selected {

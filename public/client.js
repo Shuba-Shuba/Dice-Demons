@@ -8,6 +8,7 @@ const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
 const SPIN_ANIMATION_DURATION = 200;
 const socket = io();
+var fullscreen = false;
 //#endregion
 
 //#region RUN SETUP
@@ -33,13 +34,23 @@ function setupMenu() {
 
   // TEMPORARY - REPLACE WITH SETTINGS PAGE
   const fullscreenButton = document.createElement('button');
-  fullscreenButton.addEventListener('click', () => document.body.requestFullscreen());
-  menu.appendChild(fullscreenButton);
+  fullscreenButton.id = 'fullscreen';
   fullscreenButton.textContent = '⛶';
-  fullscreenButton.style.fontSize = '2em';
-  fullscreenButton.style.fontWeight = 'bold';
-  fullscreenButton.style.height = '1.66666666667em';
-  document.getElementById('container').style.background = 'white';
+  fullscreenButton.addEventListener('click', ({target}) => {
+    fullscreen = !fullscreen;
+    if(fullscreen){
+      document.body.requestFullscreen();
+      document.getElementById('container').classList.add('fullscreen');
+      target.classList.add('fullscreen');
+      target.innerHTML = '🡦 🡧<br>🡥 🡤';
+    } else {
+      document.exitFullscreen();
+      document.getElementById('container').classList.remove('fullscreen');
+      target.classList.remove('fullscreen');
+      target.textContent = '⛶';
+    }
+  });
+  menu.appendChild(fullscreenButton);
 }
 
 function resize() {
