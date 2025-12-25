@@ -344,7 +344,11 @@ function showGame(game) {
   document.getElementById('lobby-rooms').appendChild(room);
 
   // join game automatically if name matches hash
-  if(game.name.replaceAll(' ','') === location.hash.substring(1)) roomJoinButton.click();
+  if(game.name.replaceAll(' ','') === location.hash.substring(1)){
+    roomJoinButton.click();
+    return true;
+  }
+  return false;
 }
 
 async function joinGame({target}) {
@@ -464,12 +468,17 @@ async function getGames() {
   try {
     const games = await socket.timeout(1000).emitWithAck('getGames');
     
-    if(games.length === 0) return lobby.textContent = 'No games found on server :('
-    lobby.textContent = null;
-
-    for(let i=0; i<games.length; i++){
-      showGame(games[i]);
+    if(games.length === 0) {
+      history.replaceState(null,'','/');
+      return lobby.textContent = 'No games found on server :('
     }
+    
+    lobby.textContent = null;
+    let autoJoin = false;
+    for(let i=0; i<games.length; i++){
+      if(showGame(games[i])) autoJoin = true;
+    }
+    if(!autoJoin) history.replaceState(null,'','/');
   } catch {
     const errorMsg = 'Server did not respond in time to get game list request';
     console.error(errorMsg);
