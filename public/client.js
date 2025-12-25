@@ -42,7 +42,7 @@ function setupMenu() {
       document.body.requestFullscreen();
       document.getElementById('container').classList.add('fullscreen');
       target.classList.add('fullscreen');
-      target.innerHTML = '🡦 🡧<br>🡥 🡤';
+      target.innerHTML = '↘ ↙<br>↗ ↖';
     } else {
       document.exitFullscreen();
       document.getElementById('container').classList.remove('fullscreen');

@@ -36,11 +36,11 @@ html, body {
 
 #fullscreen:not(.fullscreen) {
   font-size: 2em;
-  font-weight: 'bold';
   height: 1.6666667em;
 }
 
 #fullscreen.fullscreen {
+  font-weight: bold;
   line-height: 0.9em;
 }
 
