@@ -33,15 +33,19 @@ function setupMenu() {
 
   // fullscreen button
   const fullscreenButton = document.getElementById('fullscreen');
-  fullscreenButton.addEventListener('click', ({target}) => {
-    document.getElementById('container').classList.toggle('fullscreen');
-    const fullscreen = target.classList.toggle('fullscreen');
-    if(fullscreen) {
-      document.body.requestFullscreen();
-      target.innerHTML = '↘ ↙<br>↗ ↖';
+  fullscreenButton.addEventListener('click', () => {
+    if(document.fullscreenElement) document.exitFullscreen();
+    else document.body.requestFullscreen();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    if(document.fullscreenElement) {
+      document.getElementById('fullscreen').innerHTML = '↘ ↙<br>↗ ↖';
+      document.getElementById('fullscreen').classList.add('fullscreen');
+      document.getElementById('container').classList.add('fullscreen');
     } else {
-      document.exitFullscreen();
-      target.textContent = '⛶';
+      document.getElementById('fullscreen').textContent = '⛶';
+      document.getElementById('fullscreen').classList.remove('fullscreen');
+      document.getElementById('container').classList.remove('fullscreen');
     }
   });
 }
