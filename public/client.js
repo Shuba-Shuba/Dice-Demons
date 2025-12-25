@@ -8,7 +8,6 @@ const BOARD_RING_COUNT = 3; // excluding spawn
 const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
 const SPIN_ANIMATION_DURATION = 200;
 const socket = io();
-var fullscreen = false;
 //#endregion
 
 //#region RUN SETUP
@@ -23,7 +22,7 @@ setupChat();
 
 function setupMenu() {
   // set up menu buttons
-  for(const button of document.getElementById('menu').children){
+  for(const button of document.getElementsByClassName('page-button')){
     button.addEventListener('click', changePage);
     button.addEventListener('click', resize);
   };
@@ -32,25 +31,19 @@ function setupMenu() {
   document.getElementById('game-menubutton').classList.add('selected');
   document.getElementById('game').classList.add('selected');
 
-  // TEMPORARY - REPLACE WITH SETTINGS PAGE
-  const fullscreenButton = document.createElement('button');
-  fullscreenButton.id = 'fullscreen';
-  fullscreenButton.textContent = '⛶';
+  // fullscreen button
+  const fullscreenButton = document.getElementById('fullscreen');
   fullscreenButton.addEventListener('click', ({target}) => {
-    fullscreen = !fullscreen;
-    if(fullscreen){
+    document.getElementById('container').classList.toggle('fullscreen');
+    const fullscreen = target.classList.toggle('fullscreen');
+    if(fullscreen) {
       document.body.requestFullscreen();
-      document.getElementById('container').classList.add('fullscreen');
-      target.classList.add('fullscreen');
       target.innerHTML = '↘ ↙<br>↗ ↖';
     } else {
       document.exitFullscreen();
-      document.getElementById('container').classList.remove('fullscreen');
-      target.classList.remove('fullscreen');
       target.textContent = '⛶';
     }
   });
-  menu.appendChild(fullscreenButton);
 }
 
 function resize() {
