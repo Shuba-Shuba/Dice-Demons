@@ -490,6 +490,8 @@ async function getGames() {
 //#region CHAT
 
 async function setUsername(username) {
+  // remove non-ascii / non-printable characters (repeated on server)
+  username = username.replace(/[^ -~]/g,'');
   try {
     const response = await socket.timeout(1000).emitWithAck('setUsername', username);
     if(response.success){

@@ -288,6 +288,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUsername', (username, callback) => {
+    // remove non-ascii / non-printable characters
+    username = username.replace(/[^ -~]/g,'');
     const player = socket.data.player;
     socket.broadcast.emit('serverMessage', {
       text: `${player.username} changed their username to ${username}`,
