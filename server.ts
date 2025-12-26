@@ -18,6 +18,7 @@ interface ServerToClientEvents {
 
   // game
   updateLobby: (game: GameLobbyData) => void;
+  startGame: () => void;
   rollDice: (rolls: number[]) => void;
 }
 
@@ -27,7 +28,7 @@ interface ClientToServerEvents {
   joinGame: (gameName: string, callback: (response: {success: boolean, game?: GameLobbyData, reason?: string}) => void) => void;
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
   leaveGame: (callback: (response: {success: boolean, reason?: string}) => void) => void;
-  setReady: (ready: boolean, callback: () => void) => void;
+  setReady: (ready: boolean, callback: (response: {success: boolean, reason?: string}) => void) => void;
 
   // chat
   chatMessage: (msg: Message) => void;
@@ -269,9 +270,18 @@ io.on('connection', (socket) => {
   });
   socket.on('setReady', (ready, callback) => {
     const player = socket.data.player;
+    const game = player.currentGame;
+    if(!game) return callback({success: false, reason: 'Not in game'});
+    if(game.started) return callback({success: false, reason: 'Game already started'});
+    
     player.ready = ready;
-    if(player.currentGame) io.to(player.currentGame.name).emit('updateLobby', player.currentGame.lobbyData);
-    callback();
+    io.to(game.name).emit('updateLobby', game.lobbyData);
+    callback({success: true});
+    
+    if(ready && !game.players.some(player => player.ready === false)) {
+      game.started = true;
+      io.to(game.name).emit('startGame');
+    }
   });
   socket.on('getGames', (callback) => {
     callback(games.map(game => game.lobbyData));

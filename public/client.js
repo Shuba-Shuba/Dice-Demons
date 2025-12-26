@@ -1,11 +1,12 @@
 //#region CONSTANTS
-const BOARD_SPAWN_WIDTH = 100;
-const BOARD_LAND_WIDTH = 100;
-const BOARD_BRIDGE_LENGTH = 100;
-const BOARD_SPAWN_SPACES = 4;
-const BOARD_SPACES_PER_BRIDGE = 8; // spaces counted on outside
-const BOARD_RING_COUNT = 3; // excluding spawn
-const BOARD_PIXEL_RADIUS = BOARD_SPAWN_WIDTH + BOARD_RING_COUNT*BOARD_LAND_WIDTH + BOARD_RING_COUNT*BOARD_BRIDGE_LENGTH;
+const BOARD = {
+  width_spawn: 100,
+  width_land: 100,
+  width_bridge: 100,
+  spawn_spaces: 4,
+  spaces_per_bridge: 8,
+  rings: 2
+}
 const SPIN_ANIMATION_DURATION = 200;
 const socket = io();
 //#endregion
@@ -137,6 +138,11 @@ function setupSocket() {
 
   // game
   socket.on('updateLobby', (game) => updateLobby(game));
+  socket.on('startGame', () => {
+    setupBoard();
+    changeGamePage('content');
+    resize();
+  });
   socket.on('rollDice', (rolls) => rollDice(rolls));
 }
 
@@ -181,16 +187,17 @@ function rollDice(rolls) {
 }
 
 function setupGame() {
-  setupBoard();
   addEventListener('resize', resize);
   document.getElementById('dice-container').addEventListener('click', () => {
-    socket.emit('gameAction', 'rollDice');
+    socket.emit('rollDice');
   });
 }
 
-function setupBoard() {
+function setupBoard(options = BOARD) {
   const board = document.getElementById('board');
   board.textContent = null;
+  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
+  const r = width_spawn + rings*width_land + rings*width_bridge;
 
   // create spawn ring
   const spawn = document.createElement('canvas');
@@ -198,13 +205,13 @@ function setupBoard() {
   spawn.id = 'spawn';
   spawn.style.rotate = '0deg';
   spawn.style.zIndex = '99';
-  spawn.width = BOARD_PIXEL_RADIUS*2;
-  spawn.height = BOARD_PIXEL_RADIUS*2;
-  drawLandRing(spawn.getContext('2d'), BOARD_SPAWN_WIDTH, BOARD_SPAWN_SPACES);
+  spawn.width = r*2;
+  spawn.height = r*2;
+  drawLandRing(spawn.getContext('2d'), width_spawn, spawn_spaces, options);
   board.appendChild(spawn);
 
   // create outer rings
-  for(let i=1; i<=BOARD_RING_COUNT; i++){
+  for(let i=1; i<=rings; i++){
     // counting from 1
 
     const bridgeCanvas = document.createElement('canvas');
@@ -212,12 +219,13 @@ function setupBoard() {
     bridgeCanvas.id = `bridge${i}`;
     bridgeCanvas.style.rotate = '0deg';
     bridgeCanvas.style.zIndex = `${100 - 2*i}`;
-    bridgeCanvas.width = BOARD_PIXEL_RADIUS*2;
-    bridgeCanvas.height = BOARD_PIXEL_RADIUS*2;
+    bridgeCanvas.width = r*2;
+    bridgeCanvas.height = r*2;
     drawBridgeRing(
       bridgeCanvas.getContext('2d'),
-      BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + (i-1)*BOARD_LAND_WIDTH,
-      BOARD_SPAWN_SPACES*Math.pow(2, i)
+      width_spawn + i*width_bridge + (i-1)*width_land,
+      spawn_spaces*Math.pow(2, i),
+      options
     );
     board.appendChild(bridgeCanvas);
 
@@ -226,21 +234,24 @@ function setupBoard() {
     landCanvas.id = `land${i}`;
     landCanvas.style.rotate = '0deg';
     landCanvas.style.zIndex = `${99 - 2*i}`;
-    landCanvas.width = BOARD_PIXEL_RADIUS*2;
-    landCanvas.height = BOARD_PIXEL_RADIUS*2;
+    landCanvas.width = r*2;
+    landCanvas.height = r*2;
     drawLandRing(
       landCanvas.getContext('2d'),
-      BOARD_SPAWN_WIDTH + i*BOARD_BRIDGE_LENGTH + i*BOARD_LAND_WIDTH,
-      BOARD_SPAWN_SPACES*Math.pow(2, i)
+      width_spawn + i*width_bridge + i*width_land,
+      spawn_spaces*Math.pow(2, i),
+      options
     );
     board.appendChild(landCanvas);
   }
 }
 
-function drawBridgeRing(ctx, r, spaces) {
-  const bridges = spaces/BOARD_SPACES_PER_BRIDGE;
+function drawBridgeRing(ctx, r, spaces, options) {
+  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
+  const center = width_spawn + rings*width_land + rings*width_bridge
+  const bridges = spaces/spaces_per_bridge;
   
-  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+  ctx.translate(center,center);
 
   // blue circle
   ctx.beginPath();
@@ -261,18 +272,21 @@ function drawBridgeRing(ctx, r, spaces) {
     // draw bridge
     ctx.beginPath();
     ctx.arc(0,0, r, bridgeAngle,0, true);
-    ctx.arc(0,0, r-BOARD_BRIDGE_LENGTH+1, 0,bridgeAngle);
+    ctx.arc(0,0, r-width_bridge+1, 0,bridgeAngle);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
   }
 }
 
-function drawLandRing(ctx, r, spaces) {
-  let landWidth = BOARD_LAND_WIDTH;
-  if(r === BOARD_SPAWN_WIDTH) landWidth = r;
+function drawLandRing(ctx, r, spaces, options) {
+  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
+  const center = width_spawn + rings*width_land + rings*width_bridge
 
-  ctx.translate(BOARD_PIXEL_RADIUS,BOARD_PIXEL_RADIUS);
+  let landWidth = width_land;
+  if(r === width_spawn) landWidth = r;
+
+  ctx.translate(center,center);
 
   // green circle
   ctx.beginPath();
