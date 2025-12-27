@@ -41,10 +41,12 @@ function setupMenu() {
   document.addEventListener('fullscreenchange', () => {
     if(document.fullscreenElement) {
       document.getElementById('fullscreen').innerHTML = '↘ ↙<br>↗ ↖';
+      document.getElementById('fullscreen').title = 'Exit Fullscreen';
       document.getElementById('fullscreen').classList.add('fullscreen');
       document.getElementById('container').classList.add('fullscreen');
     } else {
       document.getElementById('fullscreen').textContent = '⛶';
+      document.getElementById('fullscreen').title = 'Enter Fullscreen';
       document.getElementById('fullscreen').classList.remove('fullscreen');
       document.getElementById('container').classList.remove('fullscreen');
     }
