@@ -334,7 +334,7 @@ function showGame(game) {
   roomName.textContent = game.name;
   roomInfo.appendChild(roomName);
   const roomStarted = document.createElement('p');
-  if(game.started) roomStarted.textContent = 'Game in progress';
+  if(game.started) roomStarted.textContent = 'Game started';
   else roomStarted.textContent = 'In lobby';
   roomInfo.appendChild(roomStarted);
   const roomPlayerCount = document.createElement('p');

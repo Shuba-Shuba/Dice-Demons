@@ -256,7 +256,7 @@ html, body {
 }
 
 .lobby-room-info {
-  flex: 0 0 20%;
+  flex: 0 0 max(7em,20%);
   display: flex;
   flex-flow: column;
   text-align: center;
