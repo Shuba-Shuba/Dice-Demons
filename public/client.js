@@ -365,13 +365,8 @@ async function joinGame({target}) {
   target.textContent = 'Joining...';
   try {
     const response = await socket.timeout(1000).emitWithAck('joinGame', this.name);
-    if(response.success) {
-      joinedGame(response.game);
-    } else {
-      history.replaceState(null,'','/');
-      console.error('Error joining game:', response.reason);
-      alert('Error joining game: ' + response.reason);
-    }
+    if(!response.success) throw new Error(response.reason);
+    joinedGame(response.game);
   } catch(e) {
     history.replaceState(null,'','/');
     console.error(e);
@@ -386,12 +381,8 @@ async function createGame({target}) {
   target.textContent = 'Creating...';
   try {
     const response = await socket.timeout(1000).emitWithAck('createGame');
-    if(response.success) {
-      joinedGame(response.game);
-    } else {
-      console.error('Error creating game:', response.reason);
-      alert('Error creating game: ' + response.reason);
-    }
+    if(!response.success) throw new Error(response.reason);
+    else joinedGame(response.game);
   } catch(e) {
     console.error(e);
     alert(e);
@@ -448,14 +439,10 @@ async function leaveGame({target}) {
   target.textContent = 'Leaving...';
   try {
     const response = await socket.timeout(1000).emitWithAck('leaveGame');
-    if(response.success) {
-      getGames();
-      history.replaceState(null,'','/');
-      changeGamePage('lobby');
-    } else {
-      console.error('Error leaving game:', response.reason);
-      alert('Error leaving game: ' + response.reason);
-    }
+    if(!response.success) throw new Error(response.reason);
+    getGames();
+    history.replaceState(null,'','/');
+    changeGamePage('lobby');
   } catch(e) {
     console.error(e);
     alert(e);
@@ -469,7 +456,8 @@ async function toggleReady({target}) {
   if(ready) target.textContent = 'Readying...';
   else target.textContent = 'Unreadying...';
   try {
-    await socket.timeout(1000).emitWithAck('setReady', ready);
+    const response = await socket.timeout(1000).emitWithAck('setReady', ready);
+    if(!response.success) throw new Error(response.reason);
   } catch(e) {
     ready = target.classList.toggle('ready');
     console.error(e);
@@ -527,15 +515,12 @@ async function saveSettings({target}) {
       rings: document.getElementById('settings-rings').value,
     });
 
-    if(response.success) {
-      document.getElementById('settings-title').textContent = 'Board Settings';
-      target.textContent = 'Edit';
-      target.addEventListener('click', editSettings, {once: true});
-      for(const e of settings.getElementsByTagName('input')){
-        e.disabled = true;
-      }
-    } else {
-      throw new Error(response.reason);
+    if(!response.success) throw new Error(response.reason);
+    document.getElementById('settings-title').textContent = 'Board Settings';
+    target.textContent = 'Edit';
+    target.addEventListener('click', editSettings, {once: true});
+    for(const e of settings.getElementsByTagName('input')){
+      e.disabled = true;
     }
   } catch(e) {
     console.error(e);
@@ -553,15 +538,10 @@ async function setUsername(username) {
   username = username.replace(/[^ -~]/g,'');
   try {
     const response = await socket.timeout(1000).emitWithAck('setUsername', username);
-    if(response.success){
-      receiveMessage(`Set username to ${username}`);
-      setCookie('username', username);
-      document.getElementById('chat-input-username').value = username;
-    } else {
-      const errorMsg = `Failed to set username: ${response.reason}`;
-      console.error(errorMsg);
-      alert(errorMsg);
-    }
+    if(!response.success) throw new Error(response.reason);
+    receiveMessage(`Set username to ${username}`);
+    setCookie('username', username);
+    document.getElementById('chat-input-username').value = username;
   } catch(e) {
     console.error(e);
     showMessage(e);
