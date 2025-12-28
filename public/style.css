@@ -270,14 +270,6 @@ html, body {
     display: contents;
   }
 
-  caption {
-    display: grid;
-    grid-template-columns: 8em 1fr 8em;
-    align-items: center;
-    justify-items: center;
-    margin: 5px;
-  }
-
   caption h2 {
     margin: 0;
   }
@@ -305,6 +297,14 @@ html, body {
 
 #room-settings input {
   width: 4em;
+}
+
+#room-settings caption {
+  display: grid;
+  grid-template-columns: 8em 1fr 8em;
+  align-items: center;
+  justify-items: center;
+  margin: 5px;
 }
 
 #game-content.shown {
