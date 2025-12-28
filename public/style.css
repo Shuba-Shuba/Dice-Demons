@@ -193,25 +193,7 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 1em;
-}
-
-/* looks like default button */
-.lobby-button {
-  background: rgb(233,233,241);
-}
-
-.lobby-button {
   font: 1rem sans-serif;
-  user-select: none;
-}
-
-.lobby-button:hover,
-.lobby-button:focus {
-  background: rgb(207,207,214);
-}
-
-.lobby-button:active {
-  background: rgb(181,181,188);
 }
 
 #lobby-rooms {
@@ -263,16 +245,66 @@ html, body {
   justify-content: center;
 }
 
-#room-players {
-  padding: 5px;
+#room-main {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
   width: 100%;
-  flex: 1;
+  gap: 1em;
+  flex-flow: column;
+}
+
+#room-main table {
+  flex: 1 1 50%;
+  padding: 5px;
   border: 1px solid black;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
-  flex-flow: column wrap;
-  column-gap: 1em;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  
+  tbody {
+    display: contents;
+  }
+
+  caption {
+    display: grid;
+    grid-template-columns: 8em 1fr 8em;
+    align-items: center;
+    justify-items: center;
+    margin: 5px;
+  }
+
+  caption h2 {
+    margin: 0;
+  }
+
+  caption button {
+    font-size: medium;
+    padding: 0.5em 1em;
+  }
+
+  tr {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  td:last-child {
+    flex: 0 0 8em;
+    text-align: center;
+  }
+
+  td:first-child {
+    flex: 1;
+  }
+}
+
+#room-settings input {
+  width: 4em;
 }
 
 #game-content.shown {

@@ -1,12 +1,4 @@
 //#region CONSTANTS
-const BOARD = {
-  width_spawn: 100,
-  width_land: 100,
-  width_bridge: 100,
-  spawn_spaces: 4,
-  spaces_per_bridge: 8,
-  rings: 2
-}
 const SPIN_ANIMATION_DURATION = 200;
 const socket = io();
 //#endregion
@@ -118,7 +110,7 @@ function setupSocket() {
   });
   socket.on('status', (reconnected, game) => {
     if(reconnected) {
-      if(game.started) console.log('reconnect to started game');
+      if(game.started) loadGame(game);
       else joinedGame(game);
     } else {
       getGames();
@@ -140,11 +132,7 @@ function setupSocket() {
 
   // game
   socket.on('updateLobby', (game) => updateLobby(game));
-  socket.on('startGame', () => {
-    setupBoard();
-    changeGamePage('content');
-    resize();
-  });
+  socket.on('startGame', (game) => loadGame(game));
   socket.on('rollDice', (rolls) => rollDice(rolls));
 }
 
@@ -154,6 +142,12 @@ function setupSocket() {
 function changeGamePage(page) {
   document.querySelector('#game .game-page.shown').classList.remove('shown');
   document.getElementById(`game-${page}`).classList.add('shown');
+}
+
+function loadGame(game) {
+  setupBoard(game.boardSettings);
+  changeGamePage('content');
+  resize();
 }
 
 function rotate(element, rotation) {
@@ -195,11 +189,10 @@ function setupGame() {
   });
 }
 
-function setupBoard(options = BOARD) {
+function setupBoard(options) {
   const board = document.getElementById('board');
   board.textContent = null;
-  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
-  const r = width_spawn + rings*width_land + rings*width_bridge;
+  const r = options.width_spawn + options.rings*options.width_land + options.rings*options.width_bridge;
 
   // create spawn ring
   const spawn = document.createElement('canvas');
@@ -209,11 +202,11 @@ function setupBoard(options = BOARD) {
   spawn.style.zIndex = '99';
   spawn.width = r*2;
   spawn.height = r*2;
-  drawLandRing(spawn.getContext('2d'), width_spawn, spawn_spaces, options);
+  drawLandRing(spawn.getContext('2d'), options.width_spawn, options.spawn_spaces, options);
   board.appendChild(spawn);
 
   // create outer rings
-  for(let i=1; i<=rings; i++){
+  for(let i=1; i<=options.rings; i++){
     // counting from 1
 
     const bridgeCanvas = document.createElement('canvas');
@@ -225,8 +218,8 @@ function setupBoard(options = BOARD) {
     bridgeCanvas.height = r*2;
     drawBridgeRing(
       bridgeCanvas.getContext('2d'),
-      width_spawn + i*width_bridge + (i-1)*width_land,
-      spawn_spaces*Math.pow(2, i),
+      options.width_spawn + i*options.width_bridge + (i-1)*options.width_land,
+      options.spawn_spaces*Math.pow(2, i),
       options
     );
     board.appendChild(bridgeCanvas);
@@ -240,8 +233,8 @@ function setupBoard(options = BOARD) {
     landCanvas.height = r*2;
     drawLandRing(
       landCanvas.getContext('2d'),
-      width_spawn + i*width_bridge + i*width_land,
-      spawn_spaces*Math.pow(2, i),
+      options.width_spawn + i*options.width_bridge + i*options.width_land,
+      options.spawn_spaces*Math.pow(2, i),
       options
     );
     board.appendChild(landCanvas);
@@ -249,9 +242,8 @@ function setupBoard(options = BOARD) {
 }
 
 function drawBridgeRing(ctx, r, spaces, options) {
-  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
-  const center = width_spawn + rings*width_land + rings*width_bridge
-  const bridges = spaces/spaces_per_bridge;
+  const center = options.width_spawn + options.rings*options.width_land + options.rings*options.width_bridge
+  const bridges = spaces/options.spaces_per_bridge;
   
   ctx.translate(center,center);
 
@@ -274,7 +266,7 @@ function drawBridgeRing(ctx, r, spaces, options) {
     // draw bridge
     ctx.beginPath();
     ctx.arc(0,0, r, bridgeAngle,0, true);
-    ctx.arc(0,0, r-width_bridge+1, 0,bridgeAngle);
+    ctx.arc(0,0, r-options.width_bridge+1, 0,bridgeAngle);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -282,11 +274,10 @@ function drawBridgeRing(ctx, r, spaces, options) {
 }
 
 function drawLandRing(ctx, r, spaces, options) {
-  const {width_spawn, width_land, width_bridge, spawn_spaces, spaces_per_bridge, rings} = options;
-  const center = width_spawn + rings*width_land + rings*width_bridge
+  const center = options.width_spawn + options.rings*options.width_land + options.rings*options.width_bridge
 
-  let landWidth = width_land;
-  if(r === width_spawn) landWidth = r;
+  let landWidth = options.width_land;
+  if(r === options.width_spawn) landWidth = r;
 
   ctx.translate(center,center);
 
@@ -322,6 +313,7 @@ function setupLobby() {
   // game room
   document.getElementById('room-leave').addEventListener('click', leaveGame);
   document.getElementById('room-ready').addEventListener('click', toggleReady);
+  document.getElementById('settings-edit').addEventListener('click', editSettings, {once: true});
 }
 
 function showGame(game) {
@@ -373,7 +365,6 @@ async function joinGame({target}) {
   target.textContent = 'Joining...';
   try {
     const response = await socket.timeout(1000).emitWithAck('joinGame', this.name);
-    target.textContent = oldText;
     if(response.success) {
       joinedGame(response.game);
     } else {
@@ -381,12 +372,12 @@ async function joinGame({target}) {
       console.error('Error joining game:', response.reason);
       alert('Error joining game: ' + response.reason);
     }
-  } catch {
-    target.textContent = oldText;
+  } catch(e) {
     history.replaceState(null,'','/');
-    const errorMsg = 'Server did not respond in time to join game request';
-    console.error(errorMsg);
-    alert(errorMsg);
+    console.error(e);
+    alert(e);
+  } finally {
+    target.textContent = oldText;
   }
 }
 
@@ -395,18 +386,17 @@ async function createGame({target}) {
   target.textContent = 'Creating...';
   try {
     const response = await socket.timeout(1000).emitWithAck('createGame');
-    target.textContent = oldText;
     if(response.success) {
       joinedGame(response.game);
     } else {
       console.error('Error creating game:', response.reason);
       alert('Error creating game: ' + response.reason);
     }
-  } catch {
+  } catch(e) {
+    console.error(e);
+    alert(e);
+  } finally {
     target.textContent = oldText;
-    const errorMsg = 'Server did not respond in time to create game request';
-    console.error(errorMsg);
-    alert(errorMsg);
   }
 }
 
@@ -418,16 +408,30 @@ function joinedGame(game) {
 
 function updateLobby(game) {
   document.querySelector('#game-room h1').textContent = game.name;
-  const roomPlayers = document.getElementById('room-players');
+  const roomPlayers = document.getElementById('room-players-list');
   roomPlayers.textContent = null;
   for(let i=0; i<game.players.length; i++){
-    const roomPlayer = document.createElement('p');
-    let playerText = game.players[i].username;
-    if(game.players[i].ready) playerText += ' - ready ✅';
-    else playerText += ' - not ready ❌';
-    roomPlayer.textContent = playerText;
+    const roomPlayer = document.createElement('tr');
+
+    const playerName = document.createElement('td');
+    playerName.textContent = game.players[i].username;
+    roomPlayer.appendChild(playerName);
+
+    const playerReady = document.createElement('td');
+    if(game.players[i].ready) playerReady.textContent = 'ready ✅';
+    else playerReady.textContent = 'not ready ❌';
+    roomPlayer.appendChild(playerReady);
+
     roomPlayers.appendChild(roomPlayer);
   }
+
+  document.getElementById('settings-land-width').value = game.boardSettings.width_land;
+  document.getElementById('settings-bridge-width').value = game.boardSettings.width_bridge;
+  document.getElementById('settings-spawn-width').value = game.boardSettings.width_spawn;
+  document.getElementById('settings-spawn-spaces').value = game.boardSettings.spawn_spaces;
+  document.getElementById('settings-spaces-per-bridge').value = game.boardSettings.spaces_per_bridge;
+  document.getElementById('settings-rings').value = game.boardSettings.rings;
+
   const username = getCookie('username');
   const readyButton = document.getElementById('room-ready');
   if(game.players.find(player => player.username === username).ready) {
@@ -444,7 +448,6 @@ async function leaveGame({target}) {
   target.textContent = 'Leaving...';
   try {
     const response = await socket.timeout(1000).emitWithAck('leaveGame');
-    target.textContent = oldText;
     if(response.success) {
       getGames();
       history.replaceState(null,'','/');
@@ -453,11 +456,11 @@ async function leaveGame({target}) {
       console.error('Error leaving game:', response.reason);
       alert('Error leaving game: ' + response.reason);
     }
-  } catch {
+  } catch(e) {
+    console.error(e);
+    alert(e);
+  } finally {
     target.textContent = oldText;
-    const errorMsg = 'Server did not respond in time to leave game request';
-    console.error(errorMsg);
-    alert(errorMsg);
   }
 }
 
@@ -467,11 +470,10 @@ async function toggleReady({target}) {
   else target.textContent = 'Unreadying...';
   try {
     await socket.timeout(1000).emitWithAck('setReady', ready);
-  } catch {
+  } catch(e) {
     ready = target.classList.toggle('ready');
-    const errorMsg = 'Server did not respond in time to toggle readiness request';
-    console.error(errorMsg);
-    alert(errorMsg);
+    console.error(e);
+    alert(e);
   } finally {
     if(ready) target.textContent = 'Ready ✅';
     else target.textContent = 'Not Ready ❌';
@@ -495,10 +497,46 @@ async function getGames() {
       if(showGame(games[i])) autoJoin = true;
     }
     if(!autoJoin) history.replaceState(null,'','/');
-  } catch {
-    const errorMsg = 'Server did not respond in time to get game list request';
-    console.error(errorMsg);
-    lobby.textContent = errorMsg;
+  } catch(e) {
+    console.error(e);
+    lobby.textContent = e;
+  }
+}
+
+function editSettings({target}) {
+  const settings = document.getElementById('room-settings');
+  for(const e of settings.getElementsByTagName('input')){
+    e.disabled = false;
+  }
+  document.getElementById('settings-title').textContent = 'EDITING';
+  target.textContent = 'Save';
+  target.addEventListener('click', saveSettings, {once: true});
+}
+
+async function saveSettings({target}) {
+  const settings = document.getElementById('room-settings');
+  target.textContent = 'Saving...';
+
+  try {
+    const response = await socket.timeout(1000).emitWithAck('saveSettings', {
+      land_width: document.getElementById('settings-land-width').value,
+      bridge_width: document.getElementById('settings-bridge-width').value,
+      spawn_width: document.getElementById('settings-spawn-width').value,
+      spawn_spaces: document.getElementById('settings-spawn-spaces').value,
+      spaces_per_bridge: document.getElementById('settings-spaces-per-bridge').value,
+      rings: document.getElementById('settings-rings').value,
+    });
+    document.getElementById('settings-title').textContent = 'Board Settings';
+    target.textContent = 'Edit';
+    target.addEventListener('click', editSettings, {once: true});
+    for(const e of settings.getElementsByTagName('input')){
+      e.disabled = true;
+    }
+  } catch(e) {
+    console.error(e);
+    alert(e);
+    target.textContent = 'Save';
+    target.addEventListener('click', saveSettings, {once: true});
   }
 }
 
@@ -519,10 +557,9 @@ async function setUsername(username) {
       console.error(errorMsg);
       alert(errorMsg);
     }
-  } catch {
-    const errorMsg = 'Server did not respond in time to set username request';
-    console.error(errorMsg);
-    showMessage(errorMsg);
+  } catch(e) {
+    console.error(e);
+    showMessage(e);
   }
 }
 

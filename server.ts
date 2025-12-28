@@ -18,7 +18,7 @@ interface ServerToClientEvents {
 
   // game
   updateLobby: (game: GameLobbyData) => void;
-  startGame: () => void;
+  startGame: (game: GameLobbyData) => void;
   rollDice: (rolls: number[]) => void;
 }
 
@@ -51,7 +51,8 @@ interface Message {
 interface GameLobbyData {
   started: boolean;
   name: string;
-  players: PlayerLobbyData[]; 
+  players: PlayerLobbyData[];
+  boardSettings: Game['boardSettings'];
 }
 
 interface PlayerLobbyData {
@@ -71,12 +72,21 @@ class Game {
   started: boolean;
   name: string;
   players: Player[];
+  boardSettings: {
+    width_spawn: number;
+    width_land: number;
+    width_bridge: number;
+    spawn_spaces: number;
+    spaces_per_bridge: number;
+    rings: number;
+  }
   gameState: Object; // subject to change as implemented
 
   constructor(name: string) {
     this.started = false;
     this.name = name;
     this.players = [];
+    this.boardSettings = this.defaultBoardSettings;
     this.gameState = {};
   }
 
@@ -85,8 +95,20 @@ class Game {
     return {
       started: this.started,
       name: this.name,
-      players: this.players.map(player => player.lobbyData)
+      players: this.players.map(player => player.lobbyData),
+      boardSettings: this.boardSettings
     }
+  }
+
+  get defaultBoardSettings(): this['boardSettings'] {
+    return {
+      width_spawn: 100,
+      width_land: 100,
+      width_bridge: 100,
+      spawn_spaces: 4,
+      spaces_per_bridge: 8,
+      rings: 2
+    };
   }
 
   removePlayer(id: string): void {
@@ -280,7 +302,7 @@ io.on('connection', (socket) => {
     
     if(ready && !game.players.some(player => player.ready === false)) {
       game.started = true;
-      io.to(game.name).emit('startGame');
+      io.to(game.name).emit('startGame', game.lobbyData);
     }
   });
   socket.on('getGames', (callback) => {
