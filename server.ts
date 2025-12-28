@@ -12,13 +12,15 @@ interface ServerToClientEvents {
   status: (reconnected: boolean, game?: GameLobbyData) => void;
   oldTab: () => void;
 
+  // lobby
+  updateLobby: (game: GameLobbyData) => void;
+  startGame: (game: GameLobbyData) => void;
+
   // chat
   serverMessage: (msg: Message) => void;
   chatMessage: (msg: Message) => void;
 
   // game
-  updateLobby: (game: GameLobbyData) => void;
-  startGame: (game: GameLobbyData) => void;
   rollDice: (rolls: number[]) => void;
 }
 
@@ -29,6 +31,7 @@ interface ClientToServerEvents {
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
   leaveGame: (callback: (response: {success: boolean, reason?: string}) => void) => void;
   setReady: (ready: boolean, callback: (response: {success: boolean, reason?: string}) => void) => void;
+  saveSettings: (boardSettings: Game['boardSettings'], callback: (response: {success: boolean, reason?: string}) => void) => void;
 
   // chat
   chatMessage: (msg: Message) => void;
@@ -304,6 +307,17 @@ io.on('connection', (socket) => {
       game.started = true;
       io.to(game.name).emit('startGame', game.lobbyData);
     }
+  });
+  socket.on('saveSettings', (boardSettings, callback) => {
+    const player = socket.data.player;
+    const game = player.currentGame;
+    if(!game) return callback({success: false, reason: 'Not in game'});
+    if(game.started) return callback({success: false, reason: 'Game already started'});
+    if(!player.host) return callback({success: false, reason: 'Permission denied'});
+
+    game.boardSettings = boardSettings;
+    callback({success: true});
+    io.to(game.name).emit('updateLobby', game.lobbyData);
   });
   socket.on('getGames', (callback) => {
     callback(games.map(game => game.lobbyData));

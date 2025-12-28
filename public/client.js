@@ -526,11 +526,16 @@ async function saveSettings({target}) {
       spaces_per_bridge: document.getElementById('settings-spaces-per-bridge').value,
       rings: document.getElementById('settings-rings').value,
     });
-    document.getElementById('settings-title').textContent = 'Board Settings';
-    target.textContent = 'Edit';
-    target.addEventListener('click', editSettings, {once: true});
-    for(const e of settings.getElementsByTagName('input')){
-      e.disabled = true;
+
+    if(response.success) {
+      document.getElementById('settings-title').textContent = 'Board Settings';
+      target.textContent = 'Edit';
+      target.addEventListener('click', editSettings, {once: true});
+      for(const e of settings.getElementsByTagName('input')){
+        e.disabled = true;
+      }
+    } else {
+      throw new Error(response.reason);
     }
   } catch(e) {
     console.error(e);
