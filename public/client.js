@@ -406,8 +406,9 @@ function updateLobby(game) {
 
     const playerName = document.createElement('td');
     playerName.textContent = game.players[i].username;
+    if(game.players[i].host) playerName.textContent += ' - HOST';
     roomPlayer.appendChild(playerName);
-
+    
     const playerReady = document.createElement('td');
     if(game.players[i].ready) playerReady.textContent = 'ready ✅';
     else playerReady.textContent = 'not ready ❌';
@@ -507,9 +508,9 @@ async function saveSettings({target}) {
 
   try {
     const response = await socket.timeout(1000).emitWithAck('saveSettings', {
-      land_width: document.getElementById('settings-land-width').value,
-      bridge_width: document.getElementById('settings-bridge-width').value,
-      spawn_width: document.getElementById('settings-spawn-width').value,
+      width_land: document.getElementById('settings-land-width').value,
+      width_bridge: document.getElementById('settings-bridge-width').value,
+      width_spawn: document.getElementById('settings-spawn-width').value,
       spawn_spaces: document.getElementById('settings-spawn-spaces').value,
       spaces_per_bridge: document.getElementById('settings-spaces-per-bridge').value,
       rings: document.getElementById('settings-rings').value,

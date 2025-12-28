@@ -14,6 +14,7 @@ interface ServerToClientEvents {
 
   // lobby
   updateLobby: (game: GameLobbyData) => void;
+  hostChanged: (newHost: PlayerLobbyData) => void;
   startGame: (game: GameLobbyData) => void;
 
   // chat
@@ -114,23 +115,28 @@ class Game {
     };
   }
 
-  removePlayer(id: string): void {
-    const i = this.players.findIndex(player => id === player.id);
+  removePlayer(player: Player): void {
+    const i = this.players.indexOf(player);
     if(i===-1) return;
-    this.players[i].currentGame = undefined;
+    
+    const isHost = player.host ?? false;
+    player.removedFromGame();
     this.players.splice(i,1);
 
     // remove from games list if no more players
     if(this.players.length === 0) games.splice(games.indexOf(this),1);
+
+    // if host removed, make first player new host 
+    else if(isHost) this.players[0].host = true;
   }
 
-  getPlayer(id: string): Player | undefined {
+  getPlayerById(id: string): Player | undefined {
     return this.players.find(player => player.id === id);
   }
 
   addPlayer(player: Player): void {
     this.players.push(player);
-    player.currentGame = this;
+    player.addedToGame(this, this.players.length === 1);
   }
 }
 
@@ -154,6 +160,18 @@ class Player {
       ready: this.ready,
       host: this.host
     }
+  }
+
+  removedFromGame() {
+    delete this.currentGame;
+    delete this.ready;
+    delete this.host;
+  }
+
+  addedToGame(game: Game, hosting: boolean) {
+    this.currentGame = game;
+    this.ready = false;
+    this.host = hosting;
   }
 }
 //#endregion
@@ -252,7 +270,6 @@ io.on('connection', (socket) => {
     const game = new Game(generateGameName());
     games.push(game);
 
-    player.ready = false;
     game.addPlayer(player);
     socket.join(game.name);
     callback({success: true, game: game.lobbyData});
@@ -274,7 +291,6 @@ io.on('connection', (socket) => {
       return console.error(`Player "${player.username}" (ID ${player.id}) tried to join a game that already started`);
     }
 
-    player.ready = false;
     game.addPlayer(player);
     io.to(gameName).emit('updateLobby', game.lobbyData);
     socket.join(gameName);
@@ -288,10 +304,10 @@ io.on('connection', (socket) => {
       return console.error(`Player "${player.username}" (ID ${player.id}) tried to leave game but is already not in a game`);
     }
 
-    game.removePlayer(player.id);
+    game.removePlayer(player);
     socket.leave(game.name);
-    io.to(game.name).emit('updateLobby', game.lobbyData);
     callback({success: true});
+    io.to(game.name).emit('updateLobby', game.lobbyData);
   });
   socket.on('setReady', (ready, callback) => {
     const player = socket.data.player;
@@ -419,7 +435,7 @@ function getPlayer(data: CookieData): {player: Player, extraTab: boolean} {
 
   // reconnecting to game
   for(let i=0; i<games.length; i++){
-    const p = games[i].getPlayer(id);
+    const p = games[i].getPlayerById(id);
     if(p) return {player: p, extraTab: false};
   }
 
