@@ -32,7 +32,7 @@ interface ClientToServerEvents {
   getGames: (callback: (games: GameLobbyData[]) => void) => void;
   leaveGame: (callback: (response: {success: boolean, reason?: string}) => void) => void;
   setReady: (ready: boolean, callback: (response: {success: boolean, reason?: string}) => void) => void;
-  saveSettings: (boardSettings: Game['boardSettings'], callback: (response: {success: boolean, reason?: string}) => void) => void;
+  saveSettings: (boardSettings: GameBoardSettings, callback: (response: {success: boolean, reason?: string}) => void) => void;
 
   // chat
   chatMessage: (msg: Message) => void;
@@ -52,11 +52,20 @@ interface Message {
   createdAt?: number;
 }
 
+interface GameBoardSettings {
+  width_spawn: number;
+  width_land: number;
+  width_bridge: number;
+  spawn_spaces: number;
+  spaces_per_bridge: number;
+  rings: number;
+}
+
 interface GameLobbyData {
   started: boolean;
   name: string;
   players: PlayerLobbyData[];
-  boardSettings: Game['boardSettings'];
+  boardSettings: GameBoardSettings;
 }
 
 interface PlayerLobbyData {
@@ -76,14 +85,7 @@ class Game {
   started: boolean;
   name: string;
   players: Player[];
-  #boardSettings: {
-    width_spawn: number;
-    width_land: number;
-    width_bridge: number;
-    spawn_spaces: number;
-    spaces_per_bridge: number;
-    rings: number;
-  }
+  #boardSettings: GameBoardSettings;
   gameState: Object; // subject to change as implemented
 
   constructor(name: string) {
@@ -104,7 +106,7 @@ class Game {
     }
   }
 
-  get defaultBoardSettings(): this['boardSettings'] {
+  get defaultBoardSettings(): GameBoardSettings {
     return {
       width_spawn: 100,
       width_land: 100,
@@ -115,11 +117,11 @@ class Game {
     };
   }
 
-  get boardSettings() {
+  get boardSettings(): GameBoardSettings {
     return this.#boardSettings;
   }
 
-  set boardSettings(newSettings: this['boardSettings']) {
+  set boardSettings(newSettings: GameBoardSettings) {
     for(const key of Object.keys(this.#boardSettings)){
       const value = parseInt(newSettings[key]);
       if(!isNaN(value)) this.#boardSettings[key] = value;
