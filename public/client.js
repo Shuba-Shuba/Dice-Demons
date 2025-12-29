@@ -190,6 +190,7 @@ function setupGame() {
 }
 
 function setupBoard(options) {
+  console.log(options);
   const board = document.getElementById('board');
   board.textContent = null;
   const r = options.width_spawn + options.rings*options.width_land + options.rings*options.width_bridge;
@@ -521,12 +522,13 @@ async function saveSettings({target}) {
 
   try {
     const response = await socket.timeout(1000).emitWithAck('saveSettings', {
-      width_land: document.getElementById('settings-land-width').value,
-      width_bridge: document.getElementById('settings-bridge-width').value,
-      width_spawn: document.getElementById('settings-spawn-width').value,
-      spawn_spaces: document.getElementById('settings-spawn-spaces').value,
-      spaces_per_bridge: document.getElementById('settings-spaces-per-bridge').value,
-      rings: document.getElementById('settings-rings').value,
+      // number coercion repeated server-side
+      width_land: Number(document.getElementById('settings-land-width').value),
+      width_bridge: Number(document.getElementById('settings-bridge-width').value),
+      width_spawn: Number(document.getElementById('settings-spawn-width').value),
+      spawn_spaces: Number(document.getElementById('settings-spawn-spaces').value),
+      spaces_per_bridge: Number(document.getElementById('settings-spaces-per-bridge').value),
+      rings: Number(document.getElementById('settings-rings').value),
     });
 
     if(!response.success) throw new Error(response.reason);

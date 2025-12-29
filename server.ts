@@ -76,7 +76,7 @@ class Game {
   started: boolean;
   name: string;
   players: Player[];
-  boardSettings: {
+  #boardSettings: {
     width_spawn: number;
     width_land: number;
     width_bridge: number;
@@ -90,7 +90,7 @@ class Game {
     this.started = false;
     this.name = name;
     this.players = [];
-    this.boardSettings = this.defaultBoardSettings;
+    this.#boardSettings = this.defaultBoardSettings;
     this.gameState = {};
   }
 
@@ -113,6 +113,17 @@ class Game {
       spaces_per_bridge: 8,
       rings: 2
     };
+  }
+
+  get boardSettings() {
+    return this.#boardSettings;
+  }
+
+  set boardSettings(newSettings: this['boardSettings']) {
+    for(const key of Object.keys(this.#boardSettings)){
+      const value = parseInt(newSettings[key]);
+      if(!isNaN(value)) this.#boardSettings[key] = value;
+    }
   }
 
   removePlayer(player: Player): void {
