@@ -285,7 +285,7 @@ html, body {
   }
 }
 
-button:disabled {
+#room-settings input:disabled {
   cursor: not-allowed;
 }
 
