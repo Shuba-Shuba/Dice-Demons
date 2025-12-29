@@ -190,7 +190,6 @@ function setupGame() {
 }
 
 function setupBoard(options) {
-  console.log(options);
   const board = document.getElementById('board');
   board.textContent = null;
   const r = options.width_spawn + options.rings*options.width_land + options.rings*options.width_bridge;
