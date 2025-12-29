@@ -157,6 +157,7 @@ class Player {
   id: string;
   username: string;
   currentGame?: Game;
+  reconnectionTimeout: NodeJS.Timeout;
 
   // lobby data
   ready?: boolean;
@@ -248,6 +249,9 @@ io.on('connection', (socket) => {
       text: `${player.username} reconnected`,
       createdAt: Date.now()
     });
+
+    clearTimeout(player.reconnectionTimeout);
+
     const game = player.currentGame;
     player.ready = false;
     io.to(game.name).emit('updateLobby', game.lobbyData);
@@ -269,6 +273,14 @@ io.on('connection', (socket) => {
       createdAt: Date.now()
     });
     delete connectedClients[player.id];
+
+    const game = player.currentGame;
+    if(game) {
+      player.reconnectionTimeout = setTimeout(() => {
+        game.removePlayer(player);
+        io.to(game.name).emit('updateLobby', game.lobbyData);
+      }, 10000);
+    }
   });
   //#endregion
 
