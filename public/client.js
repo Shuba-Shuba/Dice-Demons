@@ -399,15 +399,25 @@ function joinedGame(game) {
 
 function updateLobby(game) {
   document.querySelector('#game-room h1').textContent = game.name;
+
   const roomPlayers = document.getElementById('room-players-list');
   roomPlayers.textContent = null;
+
+  const username = getCookie('username');
+  const self = game.players.find(player => player.username === username);
+
   for(let i=0; i<game.players.length; i++){
     const roomPlayer = document.createElement('tr');
 
     const playerName = document.createElement('td');
-    playerName.textContent = game.players[i].username;
-    if(game.players[i].host) playerName.textContent += ' - HOST';
+    let str = game.players[i].username;
+    if(game.players[i] === self) str += ' (you)';
+    if(game.players[i].host) str += ' - HOST';
+    playerName.textContent = str;
     roomPlayer.appendChild(playerName);
+
+    // add empty td for dotted line
+    roomPlayer.appendChild(document.createElement('td'));
     
     const playerReady = document.createElement('td');
     if(game.players[i].ready) playerReady.textContent = 'ready ✅';
@@ -423,10 +433,13 @@ function updateLobby(game) {
   document.getElementById('settings-spawn-spaces').value = game.boardSettings.spawn_spaces;
   document.getElementById('settings-spaces-per-bridge').value = game.boardSettings.spaces_per_bridge;
   document.getElementById('settings-rings').value = game.boardSettings.rings;
+  for(const e of document.getElementById('room-settings').getElementsByTagName('input')){
+    e.disabled = true;
+  };
+  document.getElementById('settings-edit').disabled = !self.host;
 
-  const username = getCookie('username');
   const readyButton = document.getElementById('room-ready');
-  if(game.players.find(player => player.username === username).ready) {
+  if(self.ready) {
     readyButton.classList.add('ready');
     readyButton.textContent = 'Ready ✅';
   } else {

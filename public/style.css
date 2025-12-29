@@ -270,41 +270,48 @@ html, body {
     display: contents;
   }
 
-  caption h2 {
+  h2 {
     margin: 0;
   }
 
-  caption button {
-    font-size: medium;
-    padding: 0.5em 1em;
-  }
-
   tr {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-auto-flow: row;
   }
 
-  td:last-child {
-    flex: 0 0 8em;
-    text-align: center;
+  td:nth-child(2) {
+    border-bottom: 1px dotted black;
   }
+}
 
-  td:first-child {
-    flex: 1;
-  }
+button:disabled {
+  cursor: not-allowed;
+}
+
+#settings-edit {
+  font-size: medium;
+  padding: 0.5em 1em;
 }
 
 #room-settings input {
   width: 4em;
 }
 
+#room-players td:nth-child(2) {
+  margin-bottom: 0.35em;
+}
+
+#room-settings td:nth-child(2) {
+  margin-bottom: 0.5em;
+}
+
 #room-settings caption {
-  display: grid;
-  grid-template-columns: 8em 1fr 8em;
+  display: flex;
   align-items: center;
-  justify-items: center;
-  margin: 5px;
+  justify-content: center;
+  gap: 5%;
+  margin: 0.5em;
 }
 
 #game-content.shown {
