@@ -313,7 +313,12 @@ function setupLobby() {
   // game room
   document.getElementById('room-leave').addEventListener('click', leaveGame);
   document.getElementById('room-ready').addEventListener('click', toggleReady);
-  document.getElementById('settings-edit').addEventListener('click', editSettings, {once: true});
+  document.getElementById('settings-land-width').addEventListener('change', ({target}) => saveSettings({width_land: Number(target.value)}));
+  document.getElementById('settings-bridge-width').addEventListener('change', ({target}) => saveSettings({width_bridge: Number(target.value)}));
+  document.getElementById('settings-spawn-width').addEventListener('change', ({target}) => saveSettings({width_spawn: Number(target.value)}));
+  document.getElementById('settings-spawn-spaces').addEventListener('change', ({target}) => saveSettings({spawn_spaces: Number(target.value)}));
+  document.getElementById('settings-spaces-per-bridge').addEventListener('change', ({target}) => saveSettings({spaces_per_bridge: Number(target.value)}));
+  document.getElementById('settings-rings').addEventListener('change', ({target}) => saveSettings({rings: Number(target.value)}));
 }
 
 function showGame(game) {
@@ -434,9 +439,8 @@ function updateLobby(game) {
   document.getElementById('settings-spaces-per-bridge').value = game.boardSettings.spaces_per_bridge;
   document.getElementById('settings-rings').value = game.boardSettings.rings;
   for(const e of document.getElementById('room-settings').getElementsByTagName('input')){
-    e.disabled = true;
+    e.disabled = !self.host;
   };
-  document.getElementById('settings-edit').disabled = !self.host;
 
   const readyButton = document.getElementById('room-ready');
   if(self.ready) {
@@ -505,43 +509,13 @@ async function getGames() {
   }
 }
 
-function editSettings({target}) {
-  const settings = document.getElementById('room-settings');
-  for(const e of settings.getElementsByTagName('input')){
-    e.disabled = false;
-  }
-  document.getElementById('settings-title').textContent = 'EDITING';
-  target.textContent = 'Save';
-  target.addEventListener('click', saveSettings, {once: true});
-}
-
-async function saveSettings({target}) {
-  const settings = document.getElementById('room-settings');
-  target.textContent = 'Saving...';
-
+async function saveSettings(settings) {
   try {
-    const response = await socket.timeout(1000).emitWithAck('saveSettings', {
-      // number coercion repeated server-side
-      width_land: Number(document.getElementById('settings-land-width').value),
-      width_bridge: Number(document.getElementById('settings-bridge-width').value),
-      width_spawn: Number(document.getElementById('settings-spawn-width').value),
-      spawn_spaces: Number(document.getElementById('settings-spawn-spaces').value),
-      spaces_per_bridge: Number(document.getElementById('settings-spaces-per-bridge').value),
-      rings: Number(document.getElementById('settings-rings').value),
-    });
-
+    const response = await socket.timeout(1000).emitWithAck('saveSettings', settings);
     if(!response.success) throw new Error(response.reason);
-    document.getElementById('settings-title').textContent = 'Board Settings';
-    target.textContent = 'Edit';
-    target.addEventListener('click', editSettings, {once: true});
-    for(const e of settings.getElementsByTagName('input')){
-      e.disabled = true;
-    }
   } catch(e) {
     console.error(e);
     alert(e);
-    target.textContent = 'Save';
-    target.addEventListener('click', saveSettings, {once: true});
   }
 }
 
