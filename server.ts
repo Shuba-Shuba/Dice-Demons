@@ -78,6 +78,20 @@ interface CookieData {
   id: string;
   username: string;
 }
+
+interface GameState {
+  rolls: number[];
+  turn: number;
+  monsters: number[][];
+  walls: number[][];
+}
+
+interface PlayerState {
+  position: number[];
+  dice: number;
+  trinket: boolean;
+  ownWalls: number[][];
+}
 //#endregion
 
 //#region Classes
@@ -86,14 +100,13 @@ class Game {
   name: string;
   players: Player[];
   #boardSettings: GameBoardSettings;
-  gameState: Object; // subject to change as implemented
+  state?: GameState;
 
   constructor(name: string) {
     this.started = false;
     this.name = name;
     this.players = [];
     this.#boardSettings = this.defaultBoardSettings;
-    this.gameState = {};
   }
 
   get lobbyData(): GameLobbyData {
@@ -157,6 +170,7 @@ class Player {
   id: string;
   username: string;
   currentGame?: Game;
+  state?: PlayerState;
   reconnectionTimeout: NodeJS.Timeout;
 
   // lobby data
@@ -178,6 +192,7 @@ class Player {
 
   removedFromGame() {
     delete this.currentGame;
+    delete this.state;
     delete this.ready;
     delete this.host;
   }

@@ -362,6 +362,10 @@ canvas.board {
   cursor: pointer;
 }
 
+#dice-container:disabled {
+  cursor: default;
+}
+
 .dice {
   --size: max(10vmin, 40px);
   width: var(--size);
