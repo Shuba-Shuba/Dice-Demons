@@ -58,6 +58,11 @@ function resize() {
     c.style.width = px;
     c.style.height = px;
   }
+
+  // if, while chat page is selected, window resized to always show chat on side, then select game page
+  if(document.getElementById('chat').classList.contains('selected') && document.body.getBoundingClientRect().width > 1200) {
+    document.getElementById('game-menubutton').click();
+  }
 }
 
 function changePage(){

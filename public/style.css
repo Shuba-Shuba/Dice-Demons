@@ -109,37 +109,20 @@ html, body {
   font-size: medium;
 }
 
-@container content (450px <= width < 600px) {
-  #chat-input input {
-    font-size: .8em;
-  }
-}
-
-@container content (350px <= width < 450px) {
-  #chat-input input {
-    font-size: .6em;
-  }
-}
-
-@container content (width < 350px) {
-  #chat-input input {
-    font-size: .5em;
-  }
-}
-
 #chat-input label {
   font-size: large;
-  padding-left: 1em;
+  padding-left: 0.5em;
+  white-space: nowrap;
 }
 
 #chat-input-username {
   flex: 0;
-  padding: 1em .5em;
+  padding: 0.5em;
 }
 
 #chat-input-message {
   flex: 1;
-  padding: 1em;
+  padding: 0.5em;
 }
 
 #chat-messages {
@@ -424,6 +407,52 @@ canvas.board {
   #rules {
     height: 100%;
     overflow: auto;
+  }
+}
+
+@media (width > 1200px) {
+  #content {
+    display: grid;
+    grid-template-areas: 'main chat';
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 100vh;
+    grid-auto-flow: row;
+  }
+
+  .page {
+    grid-area: main;
+  }
+
+  #chat {
+    grid-area: chat;
+    padding-left: 0;
+
+    /* copy #chat.selected */
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+  }
+
+  #menu button#chat-menubutton {
+    display: none;
+  }
+}
+
+@container content (450px <= width < 600px) {
+  #chat-input input {
+    font-size: .8em;
+  }
+}
+
+@container content (350px <= width < 450px) {
+  #chat-input input {
+    font-size: .6em;
+  }
+}
+
+@container content (width < 350px) {
+  #chat-input input {
+    font-size: .5em;
   }
 }
 
