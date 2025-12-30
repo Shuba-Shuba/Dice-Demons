@@ -43,6 +43,9 @@ function setupMenu() {
       document.getElementById('container').classList.remove('fullscreen');
     }
   });
+
+  addEventListener('resize', resize);
+  resize();
 }
 
 function resize() {
@@ -59,9 +62,19 @@ function resize() {
     c.style.height = px;
   }
 
-  // if, while chat page is selected, window resized to always show chat on side, then select game page
-  if(document.getElementById('chat').classList.contains('selected') && document.body.getBoundingClientRect().width > 1200) {
-    document.getElementById('game-menubutton').click();
+  const chat = document.getElementById('chat');
+  if(document.body.getBoundingClientRect().width > 1200) {
+    if(chat.classList.contains('selected')) document.getElementById('game-menubutton').click();
+
+    if(!chat.classList.contains('sidebar')){
+      document.getElementById('sidebar').appendChild(chat);
+      chat.classList.add('sidebar');
+    }
+  } else {
+    if(chat.classList.contains('sidebar')){
+      document.getElementById('content').appendChild(chat);
+      chat.classList.remove('sidebar');
+    }
   }
 }
 
@@ -188,7 +201,6 @@ function rollDice(rolls) {
 }
 
 function setupGame() {
-  addEventListener('resize', resize);
   document.getElementById('dice-container').addEventListener('click', () => {
     socket.emit('rollDice');
   });
